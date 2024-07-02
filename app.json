@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "MyBirthdayApp",
+    "slug": "MyBirthdayApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/picture14.jpg",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/picture12.png",
+      "resizeMode": "cover",
+      "backgroundColor": "dodgerblue"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/picture3.jpg",
+        "backgroundColor": "dodgerblue",
+        "package": "the.contacts.adder"
+      },
+      "permissions": ["READ_CONTACTS", "WRITE_CONTACTS"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/picture3.jpg"
+    },
+    "plugins": ["expo-router", "expo-contacts", "expo-image-picker"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
