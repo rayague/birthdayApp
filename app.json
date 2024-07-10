@@ -21,14 +21,22 @@
         "backgroundColor": "dodgerblue",
         "package": "the.contacts.adder"
       },
-      "permissions": ["READ_CONTACTS", "WRITE_CONTACTS"]
+      "permissions": [
+        "READ_CONTACTS",
+        "WRITE_CONTACTS"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/picture3.jpg"
     },
-    "plugins": ["expo-router", "expo-contacts", "expo-image-picker"],
+    "plugins": [
+      "expo-router",
+      "expo-contacts",
+      "expo-image-picker",
+      "expo-asset"
+    ],
     "experiments": {
       "typedRoutes": true
     }

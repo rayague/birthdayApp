@@ -6,10 +6,16 @@ import {
   ImageBackground,
   Pressable,
   TextInput,
-  ScrollView
+  ScrollView,
+  Alert,
+  SafeAreaView
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import bcrypt from "react-native-bcrypt";
+import LoadingScreen from "./LoadingScreen";
+
 
 const image = require("../assets/images/picture7.jpg");
 
@@ -18,13 +24,63 @@ export default function RegisterScreen() {
 
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [nationality, setNationality] = useState("");
   const [email, setEmail] = useState("");
-  const [number, setNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const handleRegister = async () => {
+    if (!validateEmail(email)) {
+      console.log("Invalid email format");
+      Alert.alert("Error", "Invalid email format");
+      return;
+    }
+
+    if (!firstName || !lastName || !email || !password) {
+      Alert.alert("Error", "All fields are required");
+      console.Console("Error", "All fields are required");
+      return;
+    }
+
+
+    try {
+      const existingUsers = await AsyncStorage.getItem("users");
+      const users = existingUsers ? JSON.parse(existingUsers) : [];
+      
+      const userExists = users.find((user) => user.email === email);
+      if (userExists) {
+        console.log("User already exists with this email");
+        Alert.alert("Error", "User already exists with this email");
+        return;
+      }
+      
+      setLoading(true);
+
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
+      const newUser = { firstName, lastName, email, password: hashedPassword };
+      users.push(newUser);
+
+      await AsyncStorage.setItem("users", JSON.stringify(users));
+
+      console.log("User registered successfully!", newUser);
+      Alert.alert("Success", "User registered successfully!");
+      navigation.navigate("Home", { name: "HomeComponent" });
+    } catch (error) {
+      console.log("Error registering user:", error);
+      Alert.alert("Error", "Error registering user");
+    }
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
+      <LoadingScreen visible={loading} />
       <ImageBackground source={image} style={styles.image}>
         <View style={styles.inputContainer}>
           <ScrollView
@@ -68,12 +124,7 @@ export default function RegisterScreen() {
                 autoCapitalize="none"
                 placeholderTextColor="#ddd"
               />
-              <Pressable
-                style={styles.registerButton}
-                onPress={() =>
-                  navigation.navigate("Home", { name: "HomeComponent" })
-                }
-              >
+              <Pressable style={styles.registerButton} onPress={handleRegister}>
                 <Text style={styles.buttonText}>REGISTER</Text>
               </Pressable>
               <Pressable
@@ -113,7 +164,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: "#ccc"
-    // elevation: 20
   },
   input: {
     borderColor: "dodgerblue",

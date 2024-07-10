@@ -6,10 +6,17 @@ import {
   ImageBackground,
   Pressable,
   TextInput,
-  ScrollView
+  ScrollView,
+  Alert,
+  SafeAreaView
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import bcrypt from "react-native-bcrypt";
+import LoadingScreen from "./LoadingScreen";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
 
 const image = require("../assets/images/picture7.jpg");
 
@@ -18,14 +25,48 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
+  const handleLogin = async () => {
+    if (!validateEmail(email)) {
+      console.log("Invalid email format");
+      Alert.alert("Error", "Invalid email format");
+      return;
+    }
+  
+    try {
+      setLoading(true);
+      const existingUsers = await AsyncStorage.getItem("users");
+      const users = existingUsers ? JSON.parse(existingUsers) : [];
+  
+      const user = users.find((user) => user.email === email);
+      if (user && bcrypt.compareSync(password, user.password)) {
+        console.log("User logged in successfully!", user);
+        await AsyncStorage.setItem("currentUser", JSON.stringify(user)); // Store current user data
+        Alert.alert("Success", "User logged in successfully!");
+        navigation.navigate("Home", { name: "HomeScreen" });
+      } else {
+        console.log("User does not exist or incorrect credentials");
+        Alert.alert("Error", "User does not exist or incorrect credentials");
+      }
+    } catch (error) {
+      console.log("Error logging in user:", error);
+      Alert.alert("Error", "Error logging in user");
+    }
+    setLoading(false);
+  };
+  
+
+
   return (
+
     <View style={styles.container}>
+      <LoadingScreen visible={loading} />
       <ImageBackground source={image} style={styles.image}>
         <View style={styles.inputContainer}>
           <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
@@ -60,12 +101,7 @@ export default function LoginScreen() {
                 Mot de Passe oublié ?
               </Text>
 
-              <Pressable
-                style={styles.registerButton}
-                onPress={() =>
-                  navigation.navigate("Home", { name: "HomeScreen" })
-                }
-              >
+              <Pressable style={styles.registerButton} onPress={handleLogin}>
                 <Text style={styles.buttonText}>LOGIN</Text>
               </Pressable>
               <Pressable
@@ -81,6 +117,7 @@ export default function LoginScreen() {
         </View>
       </ImageBackground>
     </View>
+
   );
 }
 

@@ -1,73 +1,127 @@
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   ImageBackground,
-  TextInput,
-  Pressable
+  Pressable,
+  Alert,
+  RefreshControl,
+  ScrollView
 } from "react-native";
-import React from "react";
 import { BlurView } from "expo-blur";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./LoadingScreen";
 
 const image = require("../assets/images/picture10.jpg");
 
 export default function SettingScreen() {
+  const [user, setUser] = useState(null);
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const userData = await AsyncStorage.getItem("currentUser");
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load user data.");
+        console.error("Failed to load user data:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
           elevation: 10,
-          //   resizeMode: "cover",
           justifyContent: "center"
         }}
         source={image}
         style={styles.image}
-      ></ImageBackground>
+      />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
-        <View style={styles.itemContainer}>
-          <Icon name="account" size={24} color="white" style={styles.icon} />
-          <Text style={[styles.text, { color: "#fff" }]}>FIRST NAME</Text>
-        </View>
-        <View style={styles.itemContainer}>
-          <Icon name="account" size={24} color="white" style={styles.icon} />
-
-          <Text style={[styles.text, { color: "#fff" }]}>LAST NAME</Text>
-        </View>
-        <View style={styles.itemContainer}>
-          <Icon name="account" size={24} color="white" style={styles.icon} />
-
-          <Text style={[styles.text, { color: "#fff" }]}>EMAIL</Text>
-        </View>
-        <View style={styles.itemContainer}>
-          <Icon name="account" size={24} color="white" style={styles.icon} />
-
-          <Text style={[styles.text, { color: "#fff" }]}>PASSWORD</Text>
-        </View>
-        <Pressable
-          style={styles.editButton}
-          onPress={() =>
-            navigation.navigate("Profile", { name: "ProfileScreen" })
-          }
-        >
-          <Text style={[styles.text, { color: "#fff" }]}>EDIT</Text>
-        </Pressable>
-        <Pressable style={styles.logoutBottom}>
-          <Text style={[styles.text, { color: "#fff" }]}>LOGOUT</Text>
-        </Pressable>
+        <Text style={[styles.text, { color: "#fff" }]}>
+          YOUR INFORMATIONS HERE
+        </Text>
       </BlurView>
-    </View>
+      {user && (
+        <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
+          <View style={styles.itemContainer}>
+            <Icon name="account" size={24} color="white" style={styles.icon} />
+            <Text style={[styles.textButton, { color: "#fff" }]}>
+              {user.firstName}
+            </Text>
+          </View>
+          <View style={styles.itemContainer}>
+            <Icon name="account" size={24} color="white" style={styles.icon} />
+            <Text style={[styles.textButton, { color: "#fff" }]}>
+              {user.lastName}
+            </Text>
+          </View>
+          <View style={styles.itemContainer}>
+            <Icon name="mail" size={24} color="white" style={styles.icon} />
+            <Text style={[styles.textButton, { color: "#fff" }]}>
+              {user.email}
+            </Text>
+          </View>
+          <Pressable
+            style={styles.editButton}
+            onPress={() =>
+              navigation.navigate("Edit", {
+                name: "EditScreen"
+              })
+            }
+          >
+            <Text style={[styles.textButton, { color: "#fff" }]}>EDIT</Text>
+          </Pressable>
+          <Pressable
+            style={styles.logoutButton}
+            onPress={async () => {
+              setLoading(true);
+              await AsyncStorage.removeItem("currentUser");
+              console.log("User successfully logged out");
+              setLoading(false);
+              navigation.navigate("Inscription", {
+                name: "RegisterScreen"
+              });
+            }}
+          >
+            <Text style={[styles.textButton, { color: "#fff" }]}>LOGOUT</Text>
+          </Pressable>
+        </BlurView>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center"
+    backgroundColor: "#fff"
   },
   image: {
     height: "100%",
@@ -96,7 +150,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    fontWeight: "600"
+    fontWeight: "600",
+    textAlign: "center"
+  },
+  textButton: {
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center"
   },
   itemContainer: {
     width: "100%",
@@ -117,7 +177,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10
   },
-  logoutBottom: {
+  logoutButton: {
     width: "100%",
     alignItems: "center",
     borderBottomColor: "red",

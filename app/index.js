@@ -14,6 +14,9 @@ import ForgottenPasswordScreen from "../screens/ForgottenPasswordScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import InfosScreen from "../screens/InfosScreen";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import EditScreen from "../screens/EditScreen";
+import CelebrationsScreen from "../screens/CelebrationsScreen";
+import LoadingScreen from "../screens/LoadingScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -83,7 +86,7 @@ function HomeComponent() {
       />
       <Tab.Screen
         name="CELEBRATIONS"
-        component={SettingsScreen}
+        component={CelebrationsScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -115,9 +118,17 @@ function HomeComponent() {
 
 function NextPage() {
   return (
-    <Stack.Navigator initialRouteName="See More" screenOptions={headerOpion}>
+    <Stack.Navigator initialRouteName="DETAILS" screenOptions={headerOpion}>
       <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="See More" component={InfosScreen} />
+      <Stack.Screen name="DETAILS" component={InfosScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function EditPage() {
+  return (
+    <Stack.Navigator initialRouteName="EDIT" screenOptions={headerOpion}>
+      <Stack.Screen name="EDIT" component={EditScreen} />
     </Stack.Navigator>
   );
 }
@@ -136,6 +147,8 @@ export default function index() {
       <Stack.Screen name="Inscription" component={RegisterScreen} />
       <Stack.Screen name="Connexion" component={LoginScreen} />
       <Stack.Screen name="Page" component={NextPage} />
+      <Stack.Screen name="Loading" component={LoadingScreen} />
+      <Stack.Screen name="Edit" component={EditPage} />
       <Stack.Screen
         name="ForgottenPassword"
         component={ForgottenPasswordScreen}

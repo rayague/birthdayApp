@@ -6,16 +6,17 @@ import {
   Text,
   ImageBackground,
   Pressable,
-  FlatList,
   Image,
-  Button,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./LoadingScreen";
 
 const backgroundImage = require("../assets/images/picture10.jpg");
 
@@ -24,12 +25,29 @@ export default function HomeScreen() {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [image, setImage] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState();
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
+    if (event.type === "set") {
+      const currentDate = selectedDate || date;
+      const today = new Date();
+
+      // Setting the year to current year for comparison
+      const currentYearDate = new Date(
+        today.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
+
+      if (currentYearDate > today) {
+        Alert.alert("Error", "You cannot select a future date.");
+        setDate(today);
+      } else {
+        setDate(currentYearDate);
+      }
+    }
     setShow(false);
-    setDate(currentDate);
   };
 
   const showDatepicker = () => {
@@ -40,7 +58,7 @@ export default function HomeScreen() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      // aspect: [8, 10],
       quality: 1
     });
 
@@ -49,8 +67,39 @@ export default function HomeScreen() {
     }
   };
 
+  const saveContact = async () => {
+    if (!username || !date || !image || !selectedLanguage) {
+      Alert.alert("Error", "All fields are required");
+      return;
+    }
+    try {
+      setLoading(true);
+
+      const contactData = {
+        username,
+        date: date.toLocaleDateString(),
+        relationship: selectedLanguage,
+        image
+      };
+      let storedContacts = await AsyncStorage.getItem("contacts");
+      storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
+
+      storedContacts.push(contactData);
+
+      await AsyncStorage.setItem("contacts", JSON.stringify(storedContacts));
+
+      Alert.alert("Success", "Contact saved successfully!");
+      console.log("Contact saved successfully:", contactData);
+    } catch (error) {
+      Alert.alert("Error", "Failed to save contact. Please try again.");
+      console.error("Failed to save contact:", error);
+    }
+    setLoading(false);
+  };
+
   return (
     <View style={styles.container}>
+      <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
           elevation: 10,
@@ -63,7 +112,7 @@ export default function HomeScreen() {
         <View style={styles.contentContainer}>
           <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
             <Text style={[styles.text, { color: "#fff" }]}>
-              Enrégistez vos contacts ici
+              SAVE YOUR CONTACTS HERE
             </Text>
           </BlurView>
           <BlurView
@@ -156,7 +205,8 @@ export default function HomeScreen() {
                 <Image source={{ uri: image }} style={styles.imagePicked} />
               )}
             </View>
-            <Pressable style={styles.onSubmitButton}>
+
+            <Pressable style={styles.onSubmitButton} onPress={saveContact}>
               <Text style={styles.onSubmitText}>SAVE</Text>
             </Pressable>
           </BlurView>
@@ -167,6 +217,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Your styles here...
   container: {
     flex: 1,
     justifyContent: "center",
@@ -187,8 +238,11 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   imagePicked: {
-    width: 200,
-    height: 200
+    width: "100%",
+    height: "100%",
+    borderRadius: 5,
+    marginHorizontal: "5%",
+    position: "absolute"
   },
   blurContainer: {
     padding: 20,
@@ -205,7 +259,7 @@ const styles = StyleSheet.create({
     shadowRadius: 7.49
   },
   blurInputContainer: {
-    width: "90%",
+    width: "95%",
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -221,14 +275,14 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: "center"
   },
   input: {
     borderColor: "dodgerblue",
     borderWidth: 1,
     height: 55,
     width: "90%",
-    // marginHorizontal: "5%",
     borderRadius: 10,
     marginVertical: 5,
     paddingHorizontal: 10,
@@ -236,7 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: "white",
     fontWeight: "bold",
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -263,7 +316,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 15,
     width: "100%",
-    // marginHorizontal: "5%",
     borderRadius: 10,
     marginTop: 10,
     shadowColor: "#000",
@@ -287,7 +339,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 15,
     width: "100%",
-    // marginHorizontal: "5%",
     borderRadius: 10,
     marginTop: 10,
     shadowColor: "#000",
@@ -318,16 +369,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 55,
     width: "90%",
-
-    // marginHorizontal: "5%",
     borderRadius: 10,
     marginVertical: 5,
-    padding: "auto",
+    paddingHorizontal: 10,
     fontFamily: "sans-serif",
     fontSize: 17,
     color: "white",
     fontWeight: "bold",
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -344,7 +392,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "sans-serif",
     fontWeight: "bold",
-
     fontSize: 17
   },
   inputStatusPicker: {
@@ -373,8 +420,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 55,
     width: "90%",
-
-    // marginHorizontal: "5%",
     borderRadius: 10,
     marginVertical: 5,
     padding: "auto",
@@ -382,7 +427,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: "white",
     fontWeight: "bold",
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -399,7 +443,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "sans-serif",
     fontWeight: "bold",
-
     fontSize: 17
   },
   statusColor: {

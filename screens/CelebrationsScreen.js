@@ -78,9 +78,8 @@ const users = [
   }
 ];
 
-export default function ListScreen() {
+export default function CelebrationsScreen() {
   const navigation = useNavigation();
-
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -94,7 +93,7 @@ export default function ListScreen() {
       ></ImageBackground>
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
-          CHECK YOUR CONTACTS HERE
+          Consultez vos contats ici
         </Text>
       </BlurView>
       <FlatList
@@ -108,15 +107,33 @@ export default function ListScreen() {
               onPress={() => navigation.navigate("Page", { name: "NextPage" })}
             >
               <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
-                <View>
-                  <Text style={styles.itemHeader}>{item.name}</Text>
-                  <Text style={styles.itemText}> {item.phone}</Text>
+                <View style={styles.group}>
+                  <View>
+                    <Text style={styles.itemHeader}>{item.name}</Text>
+                    <Text style={styles.itemText}> {item.phone}</Text>
+                  </View>
+                  <Image
+                    style={styles.imageStyle}
+                    source={item.uri}
+                    transition={1000}
+                  />
                 </View>
-                <Image
-                  style={styles.imageStyle}
-                  source={item.uri}
-                  transition={1000}
-                />
+                <Pressable
+                  style={styles.generateButton}
+                  onPress={() =>
+                    navigation.navigate("Home", { name: "HomeComponent" })
+                  }
+                >
+                  <Text style={styles.buttonText}>GENERATE</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.callButton}
+                  onPress={() =>
+                    navigation.navigate("Home", { name: "HomeComponent" })
+                  }
+                >
+                  <Text style={styles.buttonText}>CALL</Text>
+                </Pressable>
               </BlurView>
             </Pressable>
           </>
@@ -165,10 +182,10 @@ const styles = StyleSheet.create({
     marginTop: 5
   },
   itemContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     width: "100%",
-    padding: 20,
+    // padding: 20,
     marginVertical: 10,
     textAlign: "center",
     borderRadius: 20,
@@ -205,5 +222,38 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     borderRadius: 100,
     objectFit: "cover"
+  },
+  generateButton: {
+    width: "90%",
+    alignItems: "center",
+    backgroundColor: "dodgerblue",
+
+    marginHorizontal: "5%",
+    marginVertical: 5,
+    padding: 10,
+    borderRadius: 10
+  },
+  callButton: {
+    width: "90%",
+    alignItems: "center",
+    backgroundColor: "#28a745",
+
+    marginHorizontal: "5%",
+    marginVertical: 5,
+    padding: 10,
+    borderRadius: 10
+  },
+  group: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: 20,
+    marginVertical: 5,
+    textAlign: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18
   }
 });
