@@ -2,87 +2,74 @@ import {
   StyleSheet,
   Text,
   View,
-  ImageProps,
   ImageBackground,
   FlatList,
-  Item,
-  Pressable
+  Pressable,
+  RefreshControl
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./LoadingScreen";
 
 const image = require("../assets/images/picture10.jpg");
 
-const users = [
-  {
-    id: "1",
-    name: "John Green",
-    phone: "9876543210",
-    uri: "https://picsum.photos/seed/696/3000/2000"
-  },
-  {
-    id: "2",
-    name: "Ranson Kons",
-    phone: "6876553210",
-    uri: "https://picsum.photos/seed/picsum/200/300"
-  },
-  {
-    id: "3",
-    name: "Remity Sons",
-    phone: "6376943210",
-    uri: "https://picsum.photos/id/237/200/300"
-  },
-  {
-    id: "4",
-    name: "Randy Samsun",
-    phone: "6473823910",
-    uri: "https://picsum.photos/200/300?grayscale"
-  },
-  {
-    id: "5",
-    name: "Rose Cane",
-    phone: "6352938476",
-    uri: "https://picsum.photos/id/26/367/267"
-  },
-  {
-    id: "6",
-    name: "Zimmy Jang",
-    phone: "7264029008",
-    uri: "https://picsum.photos/id/25/367/267"
-  },
-  {
-    id: "7",
-    name: "Jessieca Johnson",
-    phone: "4539287263",
-    uri: "https://picsum.photos/id/19/367/267"
-  },
-  {
-    id: "8",
-    name: "Julian Gulgowski",
-    phone: "4234234343",
-    uri: "https://picsum.photos/id/29/367/267"
-  },
-  {
-    id: "9",
-    name: "Ellen Veum",
-    phone: "6543987253",
-    uri: "https://picsum.photos/id/16/367/267"
-  },
-  {
-    id: "10",
-    name: "Lorena Rice",
-    phone: "6321936476",
-    uri: "https://picsum.photos/id/43/367/267"
-  }
-];
-
 export default function ListScreen() {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [contacts, setContacts] = useState([]);
+
+  const fetchContacts = async () => {
+    setLoading(true);
+    try {
+      let storedContacts = await AsyncStorage.getItem("contacts");
+      storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
+      setContacts(storedContacts);
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchContacts();
+    }
+  }, [isFocused]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchContacts();
+    setRefreshing(false);
+  };
+
+  const renderContact = ({ item }) => (
+    <Pressable
+      style={styles.itemRadius}
+      onPress={() => navigation.navigate("Page", { name: "NextPage" })}
+    >
+      <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
+        <View>
+          <Text style={styles.itemHeader}>{item.username}</Text>
+          <Text style={styles.itemText}>{item.relationship}</Text>
+        </View>
+        <Image
+          style={styles.imageStyle}
+          source={{ uri: item.image }}
+          transition={1000}
+        />
+      </BlurView>
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
+      <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
           elevation: 10,
@@ -91,7 +78,7 @@ export default function ListScreen() {
         }}
         source={image}
         style={styles.image}
-      ></ImageBackground>
+      />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
           CHECK YOUR CONTACTS HERE
@@ -100,27 +87,12 @@ export default function ListScreen() {
       <FlatList
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        data={users}
-        renderItem={({ item }) => (
-          <>
-            <Pressable
-              style={styles.itemRadius}
-              onPress={() => navigation.navigate("Page", { name: "NextPage" })}
-            >
-              <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
-                <View>
-                  <Text style={styles.itemHeader}>{item.name}</Text>
-                  <Text style={styles.itemText}> {item.phone}</Text>
-                </View>
-                <Image
-                  style={styles.imageStyle}
-                  source={item.uri}
-                  transition={1000}
-                />
-              </BlurView>
-            </Pressable>
-          </>
-        )}
+        data={contacts}
+        renderItem={renderContact}
+        keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
@@ -157,11 +129,12 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: "center"
   },
   item: {
     padding: 20,
-    fontSize: 15,
+    fontSize: 10,
     marginTop: 5
   },
   itemContainer: {
@@ -185,8 +158,8 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     width: "95%",
-    marginHorizontal: 20,
-    marginBottom: 70,
+    marginHorizontal: "auto",
+    marginBottom: 40,
     borderRadius: 20
   },
   itemHeader: {
@@ -196,7 +169,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: "white",
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "bold"
   },
   imageStyle: {

@@ -7,7 +7,8 @@ import {
   Pressable,
   Alert,
   RefreshControl,
-  ScrollView
+  ScrollView,
+  SafeAreaView
 } from "react-native";
 import { BlurView } from "expo-blur";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -48,12 +49,13 @@ export default function SettingScreen() {
   }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+    // style={styles.container}
+    <View style={styles.container}>
+      {/* <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      > */}
       <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
@@ -114,13 +116,15 @@ export default function SettingScreen() {
           </Pressable>
         </BlurView>
       )}
-    </ScrollView>
+      {/* </ScrollView> */}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // justifyContent: "center",
     backgroundColor: "#fff"
   },
   image: {
@@ -129,6 +133,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     top: 0,
+    bottom: 0,
     elevation: 20,
     resizeMode: "cover",
     justifyContent: "center"

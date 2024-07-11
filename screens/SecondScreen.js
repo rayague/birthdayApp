@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 320,
-    width: 350,
+    width: 340,
     position: "relative",
     left: 0,
     top: 30,

@@ -17,7 +17,6 @@ import bcrypt from "react-native-bcrypt";
 import LoadingScreen from "./LoadingScreen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-
 const image = require("../assets/images/picture7.jpg");
 
 export default function LoginScreen() {
@@ -38,12 +37,12 @@ export default function LoginScreen() {
       Alert.alert("Error", "Invalid email format");
       return;
     }
-  
+
     try {
       setLoading(true);
       const existingUsers = await AsyncStorage.getItem("users");
       const users = existingUsers ? JSON.parse(existingUsers) : [];
-  
+
       const user = users.find((user) => user.email === email);
       if (user && bcrypt.compareSync(password, user.password)) {
         console.log("User logged in successfully!", user);
@@ -60,11 +59,8 @@ export default function LoginScreen() {
     }
     setLoading(false);
   };
-  
-
 
   return (
-
     <View style={styles.container}>
       <LoadingScreen visible={loading} />
       <ImageBackground source={image} style={styles.image}>
@@ -95,7 +91,9 @@ export default function LoginScreen() {
               <Text
                 style={styles.forgottenText}
                 onPress={() =>
-                  navigation.navigate("Second Page", { name: "SecondScreen" })
+                  navigation.navigate("ForgottenPasswordManagement", {
+                    name: "ForgottenPasswordManagement"
+                  })
                 }
               >
                 Mot de Passe oublié ?
@@ -117,7 +115,6 @@ export default function LoginScreen() {
         </View>
       </ImageBackground>
     </View>
-
   );
 }
 

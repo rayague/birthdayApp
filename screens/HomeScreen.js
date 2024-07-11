@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -21,6 +22,7 @@ import LoadingScreen from "./LoadingScreen";
 const backgroundImage = require("../assets/images/picture10.jpg");
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
@@ -70,26 +72,46 @@ export default function HomeScreen() {
   const saveContact = async () => {
     if (!username || !date || !image || !selectedLanguage) {
       Alert.alert("Error", "All fields are required");
+      console.log("Error", "All fields are required");
       return;
     }
     try {
       setLoading(true);
 
       const contactData = {
+        id: new Date().getTime().toString(), // Utiliser un timestamp comme ID unique
         username,
         date: date.toLocaleDateString(),
         relationship: selectedLanguage,
         image
       };
+
       let storedContacts = await AsyncStorage.getItem("contacts");
       storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
 
-      storedContacts.push(contactData);
+      // Vérification si le contact existe déjà
+      const contactExists = storedContacts.some(
+        (contact) =>
+          contact.username === contactData.username &&
+          contact.date === contactData.date &&
+          contact.relationship === contactData.relationship &&
+          contact.image === contactData.image
+      );
+
+      if (contactExists) {
+        Alert.alert("Error", "Contact already exists");
+        console.log("Error", "Contact already exists");
+        setLoading(false);
+        return;
+      }
+
+      storedContacts.unshift(contactData); // Ajouter le nouveau contact en haut de la liste
 
       await AsyncStorage.setItem("contacts", JSON.stringify(storedContacts));
 
       Alert.alert("Success", "Contact saved successfully!");
       console.log("Contact saved successfully:", contactData);
+      navigation.navigate("LIST");
     } catch (error) {
       Alert.alert("Error", "Failed to save contact. Please try again.");
       console.error("Failed to save contact:", error);

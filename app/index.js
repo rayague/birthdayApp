@@ -133,6 +133,20 @@ function EditPage() {
   );
 }
 
+function ForgottenPasswordManagement() {
+  return (
+    <Stack.Navigator
+      initialRouteName="ForgottenPassword"
+      screenOptions={headerOpion}
+    >
+      <Stack.Screen
+        name="ForgottenPassword"
+        component={ForgottenPasswordScreen}
+      />
+    </Stack.Navigator>
+  );
+}
+
 export default function index() {
   return (
     <Stack.Navigator
@@ -150,8 +164,8 @@ export default function index() {
       <Stack.Screen name="Loading" component={LoadingScreen} />
       <Stack.Screen name="Edit" component={EditPage} />
       <Stack.Screen
-        name="ForgottenPassword"
-        component={ForgottenPasswordScreen}
+        name="ForgottenPasswordManagement"
+        component={ForgottenPasswordManagement}
       />
     </Stack.Navigator>
   );

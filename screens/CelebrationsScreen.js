@@ -2,84 +2,70 @@ import {
   StyleSheet,
   Text,
   View,
-  ImageProps,
   ImageBackground,
   FlatList,
-  Item,
-  Pressable
+  Pressable,
+  RefreshControl,
+  Modal,
+  Button
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const image = require("../assets/images/picture10.jpg");
 
-const users = [
-  {
-    id: "1",
-    name: "John Green",
-    phone: "9876543210",
-    uri: "https://picsum.photos/seed/696/3000/2000"
-  },
-  {
-    id: "2",
-    name: "Ranson Kons",
-    phone: "6876553210",
-    uri: "https://picsum.photos/seed/picsum/200/300"
-  },
-  {
-    id: "3",
-    name: "Remity Sons",
-    phone: "6376943210",
-    uri: "https://picsum.photos/id/237/200/300"
-  },
-  {
-    id: "4",
-    name: "Randy Samsun",
-    phone: "6473823910",
-    uri: "https://picsum.photos/200/300?grayscale"
-  },
-  {
-    id: "5",
-    name: "Rose Cane",
-    phone: "6352938476",
-    uri: "https://picsum.photos/id/26/367/267"
-  },
-  {
-    id: "6",
-    name: "Zimmy Jang",
-    phone: "7264029008",
-    uri: "https://picsum.photos/id/25/367/267"
-  },
-  {
-    id: "7",
-    name: "Jessieca Johnson",
-    phone: "4539287263",
-    uri: "https://picsum.photos/id/19/367/267"
-  },
-  {
-    id: "8",
-    name: "Julian Gulgowski",
-    phone: "4234234343",
-    uri: "https://picsum.photos/id/29/367/267"
-  },
-  {
-    id: "9",
-    name: "Ellen Veum",
-    phone: "6543987253",
-    uri: "https://picsum.photos/id/16/367/267"
-  },
-  {
-    id: "10",
-    name: "Lorena Rice",
-    phone: "6321936476",
-    uri: "https://picsum.photos/id/43/367/267"
-  }
-];
-
 export default function CelebrationsScreen() {
   const navigation = useNavigation();
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Function to get and filter contacts
+  const fetchContacts = useCallback(async () => {
+    setLoading(true);
+    setRefreshing(true);
+    console.log("Fetching contacts...");
+    try {
+      const storedContacts = await AsyncStorage.getItem("contacts");
+      if (storedContacts) {
+        const allContacts = JSON.parse(storedContacts);
+        const today = new Date();
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(today.getDate() - 3);
+
+        // Filter contacts based on date
+        const filteredContacts = allContacts.filter((contact) => {
+          const contactDate = new Date(contact.date);
+          return contactDate >= threeDaysAgo && contactDate <= today;
+        });
+
+        // Sort contacts with the most recent date first
+        filteredContacts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setContacts(filteredContacts);
+        console.log("Contacts fetched and filtered:", filteredContacts);
+      } else {
+        console.log("No contacts found in storage.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error);
+    }
+    setLoading(false);
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
+
+  // Refresh control handler
+  const onRefresh = useCallback(() => {
+    console.log("Refreshing contacts...");
+    fetchContacts();
+  }, [fetchContacts]);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -90,16 +76,18 @@ export default function CelebrationsScreen() {
         }}
         source={image}
         style={styles.image}
-      ></ImageBackground>
+      />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
-          Consultez vos contats ici
+          Consultez vos contacts ici
         </Text>
       </BlurView>
+
       <FlatList
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        data={users}
+        data={contacts}
+        keyExtractor={(item) => item.id} // Ensure each item has a unique key
         renderItem={({ item }) => (
           <>
             <Pressable
@@ -109,12 +97,12 @@ export default function CelebrationsScreen() {
               <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
                 <View style={styles.group}>
                   <View>
-                    <Text style={styles.itemHeader}>{item.name}</Text>
-                    <Text style={styles.itemText}> {item.phone}</Text>
+                    <Text style={styles.itemHeader}>{item.username}</Text>
+                    <Text style={styles.itemText}> {item.relationship}</Text>
                   </View>
                   <Image
                     style={styles.imageStyle}
-                    source={item.uri}
+                    source={{ uri: item.image }}
                     transition={1000}
                   />
                 </View>
@@ -138,6 +126,13 @@ export default function CelebrationsScreen() {
             </Pressable>
           </>
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#9Bd35A", "#689F38"]}
+          />
+        }
       />
     </View>
   );
@@ -202,8 +197,8 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     width: "95%",
-    marginHorizontal: 20,
-    marginBottom: 70,
+    marginHorizontal: "auto",
+    marginBottom: 40,
     borderRadius: 20
   },
   itemHeader: {

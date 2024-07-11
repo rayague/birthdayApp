@@ -16,7 +16,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import bcrypt from "react-native-bcrypt";
 import LoadingScreen from "./LoadingScreen";
 
-
 const image = require("../assets/images/picture7.jpg");
 
 export default function RegisterScreen() {
@@ -42,22 +41,21 @@ export default function RegisterScreen() {
 
     if (!firstName || !lastName || !email || !password) {
       Alert.alert("Error", "All fields are required");
-      console.Console("Error", "All fields are required");
+      console.log("Error", "All fields are required");
       return;
     }
-
 
     try {
       const existingUsers = await AsyncStorage.getItem("users");
       const users = existingUsers ? JSON.parse(existingUsers) : [];
-      
+
       const userExists = users.find((user) => user.email === email);
       if (userExists) {
         console.log("User already exists with this email");
         Alert.alert("Error", "User already exists with this email");
         return;
       }
-      
+
       setLoading(true);
 
       const salt = bcrypt.genSaltSync(10);
