@@ -43,7 +43,9 @@ export default function CelebrationsScreen() {
 
         // Filter contacts based on date range
         const filtered = allContacts.filter((contact) => {
-          const contactDate = new Date(contact.date);
+          const [month, day, year] = contact.date.split("/").map(Number);
+          const contactDate = new Date(year, month - 1, day); // Create Date object
+
           return contactDate >= today && contactDate <= endDate;
         });
 
@@ -69,7 +71,6 @@ export default function CelebrationsScreen() {
     console.log("Refreshing contacts...");
     fetchContacts();
   }, [fetchContacts]);
-
   return (
     <View style={styles.container}>
       <LoadingScreen visible={loading} />
