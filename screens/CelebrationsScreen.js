@@ -14,14 +14,23 @@ import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./LoadingScreen";
 
 const image = require("../assets/images/picture10.jpg");
 
 export default function CelebrationsScreen() {
-  const navigation = useNavigation();
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Function to format date from 'M/D/YYYY' to 'YYYY-MM-DD'
+  const formatDate = (dateStr) => {
+    const [month, day, year] = dateStr.split("/");
+    if (month && day && year) {
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    return null; // Return null for invalid date formats
+  };
 
   // Function to get and filter contacts
   const fetchContacts = useCallback(async () => {
@@ -32,18 +41,34 @@ export default function CelebrationsScreen() {
       const storedContacts = await AsyncStorage.getItem("contacts");
       if (storedContacts) {
         const allContacts = JSON.parse(storedContacts);
+        console.log("Stored contacts:", allContacts); // Log the stored contacts
+
         const today = new Date();
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(today.getDate() - 3);
+        const fiveDaysFromNow = new Date();
+        fiveDaysFromNow.setDate(today.getDate() + 5);
+
+        const todayISO = today.toISOString().split("T")[0];
+        const fiveDaysFromNowISO = fiveDaysFromNow.toISOString().split("T")[0];
 
         // Filter contacts based on date
         const filteredContacts = allContacts.filter((contact) => {
-          const contactDate = new Date(contact.date);
-          return contactDate >= threeDaysAgo && contactDate <= today;
+          const contactDateISO = formatDate(contact.date);
+          if (!contactDateISO) {
+            console.error(`Invalid date format for contact:`, contact);
+            return false; // Exclude contacts with invalid dates
+          }
+          return (
+            contactDateISO >= todayISO && contactDateISO <= fiveDaysFromNowISO
+          );
         });
 
         // Sort contacts with the most recent date first
-        filteredContacts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        filteredContacts.sort((a, b) => {
+          const dateA = new Date(formatDate(a.date));
+          const dateB = new Date(formatDate(b.date));
+          return dateB - dateA;
+        });
+
         setContacts(filteredContacts);
         console.log("Contacts fetched and filtered:", filteredContacts);
       } else {
@@ -68,6 +93,7 @@ export default function CelebrationsScreen() {
 
   return (
     <View style={styles.container}>
+      <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
           elevation: 10,
@@ -79,7 +105,7 @@ export default function CelebrationsScreen() {
       />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
-          Consultez vos contacts ici
+          Consultez vos contacts
         </Text>
       </BlurView>
 
@@ -180,7 +206,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     width: "100%",
-    // padding: 20,
+    padding: 20,
     marginVertical: 10,
     textAlign: "center",
     borderRadius: 20,
@@ -197,7 +223,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     width: "95%",
-    marginHorizontal: "auto",
+    marginHorizontal: 10,
     marginBottom: 40,
     borderRadius: 20
   },

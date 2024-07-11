@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  StyleSheet,
   Text,
   ImageBackground,
   Pressable,
   Image,
   ScrollView,
-  Alert
+  Alert,
+  StyleSheet
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
@@ -32,22 +32,7 @@ export default function HomeScreen() {
 
   const onChange = (event, selectedDate) => {
     if (event.type === "set") {
-      const currentDate = selectedDate || date;
-      const today = new Date();
-
-      // Setting the year to current year for comparison
-      const currentYearDate = new Date(
-        today.getFullYear(),
-        currentDate.getMonth(),
-        currentDate.getDate()
-      );
-
-      if (currentYearDate > today) {
-        Alert.alert("Error", "You cannot select a future date.");
-        setDate(today);
-      } else {
-        setDate(currentYearDate);
-      }
+      setDate(selectedDate || date);
     }
     setShow(false);
   };
@@ -60,7 +45,6 @@ export default function HomeScreen() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      // aspect: [8, 10],
       quality: 1
     });
 
@@ -111,6 +95,11 @@ export default function HomeScreen() {
 
       Alert.alert("Success", "Contact saved successfully!");
       console.log("Contact saved successfully:", contactData);
+
+      setUsername("");
+      setDate(new Date());
+      setImage(null);
+      setSelectedLanguage("");
       navigation.navigate("LIST");
     } catch (error) {
       Alert.alert("Error", "Failed to save contact. Please try again.");
@@ -164,7 +153,10 @@ export default function HomeScreen() {
                 onPress={showDatepicker}
               >
                 <Text style={styles.datePickerText}>
-                  {date.toLocaleDateString()}
+                  {date.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "long"
+                  })}
                 </Text>
               </Pressable>
               {show && (
