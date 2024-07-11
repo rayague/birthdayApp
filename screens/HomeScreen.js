@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -30,6 +30,10 @@ export default function HomeScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
   const onChange = (event, selectedDate) => {
     if (event.type === "set") {
       setDate(selectedDate || date);
@@ -53,6 +57,18 @@ export default function HomeScreen() {
     }
   };
 
+  const fetchContacts = async () => {
+    try {
+      const storedContacts = await AsyncStorage.getItem("contacts");
+      const contacts = storedContacts ? JSON.parse(storedContacts) : [];
+      console.log("Fetched contacts:", contacts);
+      // Par exemple, si tu as un état pour les contacts
+      // setContacts(contacts);
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error);
+    }
+  };
+
   const saveContact = async () => {
     if (!username || !date || !image || !selectedLanguage) {
       Alert.alert("Error", "All fields are required");
@@ -63,7 +79,7 @@ export default function HomeScreen() {
       setLoading(true);
 
       const contactData = {
-        id: new Date().getTime().toString(), // Utiliser un timestamp comme ID unique
+        id: new Date().getTime().toString(),
         username,
         date: date.toLocaleDateString(),
         relationship: selectedLanguage,
@@ -73,7 +89,6 @@ export default function HomeScreen() {
       let storedContacts = await AsyncStorage.getItem("contacts");
       storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
 
-      // Vérification si le contact existe déjà
       const contactExists = storedContacts.some(
         (contact) =>
           contact.username === contactData.username &&
@@ -89,7 +104,7 @@ export default function HomeScreen() {
         return;
       }
 
-      storedContacts.unshift(contactData); // Ajouter le nouveau contact en haut de la liste
+      storedContacts.unshift(contactData);
 
       await AsyncStorage.setItem("contacts", JSON.stringify(storedContacts));
 
@@ -100,6 +115,7 @@ export default function HomeScreen() {
       setDate(new Date());
       setImage(null);
       setSelectedLanguage("");
+      fetchContacts();
       navigation.navigate("LIST");
     } catch (error) {
       Alert.alert("Error", "Failed to save contact. Please try again.");

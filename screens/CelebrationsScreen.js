@@ -19,18 +19,11 @@ import LoadingScreen from "./LoadingScreen";
 const image = require("../assets/images/picture10.jpg");
 
 export default function CelebrationsScreen() {
+  const navigation = useNavigation();
   const [contacts, setContacts] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-  // Function to format date from 'M/D/YYYY' to 'YYYY-MM-DD'
-  const formatDate = (dateStr) => {
-    const [month, day, year] = dateStr.split("/");
-    if (month && day && year) {
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    }
-    return null; // Return null for invalid date formats
-  };
 
   // Function to get and filter contacts
   const fetchContacts = useCallback(async () => {
@@ -43,34 +36,20 @@ export default function CelebrationsScreen() {
         const allContacts = JSON.parse(storedContacts);
         console.log("Stored contacts:", allContacts); // Log the stored contacts
 
+        // Calculate the date range
         const today = new Date();
-        const fiveDaysFromNow = new Date();
-        fiveDaysFromNow.setDate(today.getDate() + 5);
+        const endDate = new Date();
+        endDate.setDate(today.getDate() + 5);
 
-        const todayISO = today.toISOString().split("T")[0];
-        const fiveDaysFromNowISO = fiveDaysFromNow.toISOString().split("T")[0];
-
-        // Filter contacts based on date
-        const filteredContacts = allContacts.filter((contact) => {
-          const contactDateISO = formatDate(contact.date);
-          if (!contactDateISO) {
-            console.error(`Invalid date format for contact:`, contact);
-            return false; // Exclude contacts with invalid dates
-          }
-          return (
-            contactDateISO >= todayISO && contactDateISO <= fiveDaysFromNowISO
-          );
+        // Filter contacts based on date range
+        const filtered = allContacts.filter((contact) => {
+          const contactDate = new Date(contact.date);
+          return contactDate >= today && contactDate <= endDate;
         });
 
-        // Sort contacts with the most recent date first
-        filteredContacts.sort((a, b) => {
-          const dateA = new Date(formatDate(a.date));
-          const dateB = new Date(formatDate(b.date));
-          return dateB - dateA;
-        });
-
-        setContacts(filteredContacts);
-        console.log("Contacts fetched and filtered:", filteredContacts);
+        setContacts(allContacts); // Met à jour l'état avec tous les contacts
+        setFilteredContacts(filtered); // Met à jour l'état avec les contacts filtrés
+        console.log("Contacts fetched:", filtered);
       } else {
         console.log("No contacts found in storage.");
       }
@@ -112,10 +91,11 @@ export default function CelebrationsScreen() {
       <FlatList
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        data={contacts}
+        data={filteredContacts} // Use filteredContacts here
         keyExtractor={(item) => item.id} // Ensure each item has a unique key
-        renderItem={({ item }) => (
-          <>
+        renderItem={({ item }) => {
+          console.log(`Date for contact ${item.username}: ${item.date}`);
+          return (
             <Pressable
               style={styles.itemRadius}
               onPress={() => navigation.navigate("Page", { name: "NextPage" })}
@@ -150,8 +130,8 @@ export default function CelebrationsScreen() {
                 </Pressable>
               </BlurView>
             </Pressable>
-          </>
-        )}
+          );
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
