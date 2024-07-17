@@ -7,7 +7,9 @@ import {
   Pressable,
   RefreshControl,
   Modal,
-  Button
+  Button,
+  Platform,
+  Alert
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { BlurView } from "expo-blur";
@@ -16,6 +18,8 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./LoadingScreen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import * as Linking from "expo-linking";
+import * as Contacts from "expo-contacts";
 
 const image = require("../assets/images/picture10.jpg");
 
@@ -72,6 +76,28 @@ export default function CelebrationsScreen() {
     console.log("Refreshing contacts...");
     fetchContacts();
   }, [fetchContacts]);
+
+  const openContacts = async () => {
+    if (Platform.OS === "android" || Platform.OS === "ios") {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission refusée",
+          "Nous avons besoin de l'autorisation d'accéder à vos contacts."
+        );
+        return;
+      }
+
+      if (Platform.OS === "android") {
+        // Ouvrir l'application Contacts sur Android
+        Linking.openURL("content://contacts/people/");
+      } else if (Platform.OS === "ios") {
+        // Ouvrir l'application Contacts sur iOS
+        Linking.openURL("contacts://");
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LoadingScreen visible={loading} />
@@ -124,9 +150,10 @@ export default function CelebrationsScreen() {
                 </Pressable>
                 <Pressable
                   style={styles.callButton}
-                  onPress={() =>
-                    navigation.navigate("Home", { name: "HomeComponent" })
-                  }
+                  // onPress={() =>
+                  //   navigation.navigate("Home", { name: "HomeComponent" })
+                  // }
+                  onPress={openContacts}
                 >
                   <Text style={styles.buttonText}>CALL</Text>
                 </Pressable>
