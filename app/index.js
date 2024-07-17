@@ -71,7 +71,7 @@ function HomeComponent() {
         }}
       />
       <Tab.Screen
-        name="LIST"
+        name="LISTS"
         component={ListScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (

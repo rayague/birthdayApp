@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const image1 = require("../assets/images/picture2.jpg");
 const image2 = require("../assets/images/picture1.jpg");
@@ -41,14 +42,11 @@ export default function FirstScreen() {
       </View>
       <View style={styles.TextContainer}>
         <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
-          <Text style={styles.WelcomeText}>
-            🎉 Bienvenue sur notre application 🎉
-          </Text>
+          <Text style={styles.WelcomeText}>🎉 WELCOME TO OUR 🎉 </Text>
           <Text style={styles.WelcomeText2}>
-            Nous sommes enchantés de vous accueillir ! 😊 Ici, chaque jour est
-            une occasion de célébrer 🎊 et de créer des souvenirs inoubliables
-            📸. Nous sommes là pour vous aider à rendre chaque anniversaire
-            spécial. 🎈
+            We are delighted to welcome you! 😊 Here, every day is an
+            opportunity to celebrate 🎊 and create unforgettable memories 📸. We
+            are here to help make every birthday special. 🎈
           </Text>
         </BlurView>
       </View>
@@ -58,7 +56,7 @@ export default function FirstScreen() {
           navigation.navigate("Second Page", { name: "SecondScreen" })
         }
       >
-        <Text style={styles.ButtonText}>Suivant</Text>
+        <Text style={styles.ButtonText}>NEXT</Text>
       </Pressable>
     </View>
   );
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: "bold",
     color: "white",
-    fontWeight: "800"
+    fontWeight: "900"
   },
   WelcomeText2: {
     fontFamily: "sans-serif",
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "white",
     fontWeight: "400"
+    // textTransform:
   },
   NextButton: {
     backgroundColor: "white",
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
   },
   blurContainer: {
     // flex: 1,
-    // padding: 20,
+    padding: 10,
     // margin: 16,
     textAlign: "center",
     justifyContent: "center",

@@ -13,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import bcrypt from "react-native-bcrypt";
 import { BlurView } from "expo-blur";
 import LoadingScreen from "./LoadingScreen";
-
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const backgroundImage = require("../assets/images/picture10.jpg");
 
@@ -36,7 +36,7 @@ export default function EditScreen() {
           setFirstName(userData.firstName);
           setLastName(userData.lastName);
           setEmail(userData.email);
-          setPassword(userData.password);  // Set the hashed password here
+          setPassword(userData.password); // Set the hashed password here
           setOriginalPassword(userData.password); // Save the original hashed password
         }
       } catch (error) {
@@ -82,7 +82,7 @@ export default function EditScreen() {
 
   return (
     <View style={styles.container}>
-       <LoadingScreen visible={loading} />
+      <LoadingScreen visible={loading} />
       <ImageBackground
         imageStyle={{
           elevation: 10,
@@ -97,49 +97,44 @@ export default function EditScreen() {
         </Text>
       </BlurView>
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
-
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholderTextColor="#fff"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-        placeholderTextColor="#fff"
-
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor="#fff"
-
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#fff"
-      />
-      <Pressable style={styles.button} onPress={saveUserData}>
-        <Text style={styles.buttonText}>SAVE</Text>
-      </Pressable>
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+          placeholderTextColor="#fff"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+          placeholderTextColor="#fff"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholderTextColor="#fff"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholderTextColor="#fff"
+        />
+        <Pressable style={styles.button} onPress={saveUserData}>
+          <Text style={styles.buttonText}>SAVE</Text>
+        </Pressable>
       </BlurView>
-
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

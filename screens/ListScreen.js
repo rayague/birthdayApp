@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./LoadingScreen";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const image = require("../assets/images/picture10.jpg");
 

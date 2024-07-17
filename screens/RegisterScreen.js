@@ -15,6 +15,7 @@ import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import bcrypt from "react-native-bcrypt";
 import LoadingScreen from "./LoadingScreen";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const image = require("../assets/images/picture7.jpg");
 

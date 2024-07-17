@@ -30,8 +30,8 @@ export default function SecondScreen() {
       <View style={styles.TextContainer}>
         <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
           <Text style={styles.WelcomeText2}>
-            🎁 Trouvez des idées cadeaux 🎉, planifiez des fêtes 🎂 et envoyez
-            des vœux 💌 avec notre application. 🎊 Célébrons ensemble ! 🎈
+            🎁 Find gift ideas 🎉, plan parties 🎂, and send wishes 💌 with our
+            app. 🎊 Let's celebrate together! 🎈
           </Text>
         </BlurView>
       </View>
@@ -41,7 +41,7 @@ export default function SecondScreen() {
           navigation.navigate("Inscription", { name: "RegisterScreen" })
         }
       >
-        <Text style={styles.ButtonText}>Commencer</Text>
+        <Text style={styles.ButtonText}>START</Text>
       </Pressable>
     </View>
   );

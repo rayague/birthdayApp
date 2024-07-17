@@ -13,6 +13,7 @@ import bcrypt from "react-native-bcrypt";
 import { BlurView } from "expo-blur";
 import LoadingScreen from "./LoadingScreen";
 import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const backgroundImage = require("../assets/images/picture10.jpg");
 
