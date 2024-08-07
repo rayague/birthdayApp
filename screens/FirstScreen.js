@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     position: "relative",
     left: 0,
     top: 50,
-    borderRadius: 50,
+    borderRadius: 10,
     transform: "rotate(-20deg)",
     elevation: 20,
     resizeMode: "cover",

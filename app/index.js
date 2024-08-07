@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -17,6 +17,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import EditScreen from "../screens/EditScreen";
 import CelebrationsScreen from "../screens/CelebrationsScreen";
 import LoadingScreen from "../screens/LoadingScreen";
+import GeneratedTextScreen from "../screens/GeneratedTextScreen";
+import { RegisterForPushNotificationsAsync } from "../screens/RegisterForPushNotificationsAsync"; // Assurez-vous que le chemin est correct
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,15 +36,16 @@ const screenOptions = {
   },
   headerStyle: {
     backgroundColor: "dodgerblue",
-    borderBottomWidth: 2, // Épaisseur de la bordure
+    borderBottomWidth: 2,
     borderBottomColor: "dodgerblue"
   },
   headerTitleStyle: {
-    color: "white", // Modifier la couleur du texte du titre du header ici
+    color: "white",
     fontWeight: 900,
     fontSize: 30
   }
 };
+
 const headerOpion = {
   headerStyle: {
     backgroundColor: "dodgerblue"
@@ -133,6 +136,17 @@ function EditPage() {
   );
 }
 
+function Generated() {
+  return (
+    <Stack.Navigator
+      initialRouteName="GeneratedText"
+      screenOptions={headerOpion}
+    >
+      <Stack.Screen name="GeneratedText" component={GeneratedTextScreen} />
+    </Stack.Navigator>
+  );
+}
+
 function ForgottenPasswordManagement() {
   return (
     <Stack.Navigator
@@ -148,12 +162,19 @@ function ForgottenPasswordManagement() {
 }
 
 export default function index() {
+  useEffect(() => {
+    const registerForPushNotifications = async () => {
+      const token = await RegisterForPushNotificationsAsync();
+      console.log("Expo Push Token:", token);
+    };
+
+    registerForPushNotifications();
+  }, []);
+
   return (
     <Stack.Navigator
       initialRouteName="First Page"
-      screenOptions={{
-        headerShown: false
-      }}
+      screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="First Page" component={FirstScreen} />
       <Stack.Screen name="Second Page" component={SecondScreen} />
@@ -163,6 +184,7 @@ export default function index() {
       <Stack.Screen name="Page" component={NextPage} />
       <Stack.Screen name="Loading" component={LoadingScreen} />
       <Stack.Screen name="Edit" component={EditPage} />
+      <Stack.Screen name="GeneratedTextScreen" component={Generated} />
       <Stack.Screen
         name="ForgottenPasswordManagement"
         component={ForgottenPasswordManagement}

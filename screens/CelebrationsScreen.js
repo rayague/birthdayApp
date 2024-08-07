@@ -6,8 +6,6 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  Modal,
-  Button,
   Platform,
   Alert
 } from "react-native";
@@ -20,6 +18,8 @@ import LoadingScreen from "./LoadingScreen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as Linking from "expo-linking";
 import * as Contacts from "expo-contacts";
+import TextGenerator from "./TextGenerator";
+import * as Notifications from "expo-notifications";
 
 const image = require("../assets/images/picture10.jpg");
 
@@ -30,7 +30,6 @@ export default function CelebrationsScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Function to get and filter contacts
   const fetchContacts = useCallback(async () => {
     setLoading(true);
     setRefreshing(true);
@@ -39,24 +38,23 @@ export default function CelebrationsScreen() {
       const storedContacts = await AsyncStorage.getItem("contacts");
       if (storedContacts) {
         const allContacts = JSON.parse(storedContacts);
-        console.log("Stored contacts:", allContacts); // Log the stored contacts
+        console.log("Stored contacts:", allContacts);
 
-        // Calculate the date range
         const today = new Date();
         const endDate = new Date();
         endDate.setDate(today.getDate() + 5);
 
-        // Filter contacts based on date range
         const filtered = allContacts.filter((contact) => {
           const [month, day, year] = contact.date.split("/").map(Number);
-          const contactDate = new Date(year, month - 1, day); // Create Date object
-
+          const contactDate = new Date(year, month - 1, day);
           return contactDate >= today && contactDate <= endDate;
         });
 
-        setContacts(allContacts); // Met à jour l'état avec tous les contacts
-        setFilteredContacts(filtered); // Met à jour l'état avec les contacts filtrés
+        setContacts(allContacts);
+        setFilteredContacts(filtered);
         console.log("Contacts fetched:", filtered);
+
+        await scheduleNotificationsForContacts(filtered);
       } else {
         console.log("No contacts found in storage.");
       }
@@ -71,7 +69,6 @@ export default function CelebrationsScreen() {
     fetchContacts();
   }, [fetchContacts]);
 
-  // Refresh control handler
   const onRefresh = useCallback(() => {
     console.log("Refreshing contacts...");
     fetchContacts();
@@ -82,19 +79,59 @@ export default function CelebrationsScreen() {
       const { status } = await Contacts.requestPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          "Permission refusée",
-          "Nous avons besoin de l'autorisation d'accéder à vos contacts."
+          "Permission denied",
+          "We need permission to access your contacts."
         );
         return;
       }
 
       if (Platform.OS === "android") {
-        // Ouvrir l'application Contacts sur Android
         Linking.openURL("content://contacts/people/");
       } else if (Platform.OS === "ios") {
-        // Ouvrir l'application Contacts sur iOS
         Linking.openURL("contacts://");
       }
+    }
+  };
+
+  const scheduleNotificationsForContacts = async (contacts) => {
+    try {
+      const today = new Date();
+      for (const contact of contacts) {
+        const [month, day, year] = contact.date.split("/").map(Number);
+        const contactDate = new Date(year, month - 1, day);
+        for (let i = 0; i < 5; i++) {
+          const notificationDate = new Date(contactDate);
+          notificationDate.setFullYear(today.getFullYear());
+          notificationDate.setDate(notificationDate.getDate() - i);
+
+          if (notificationDate > today) {
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: `Reminder for ${contact.username}`,
+                body: `${contact.username}'s birthday is in ${
+                  5 - i
+                } day(s)! Status: ${contact.status}`,
+                sound: true
+              },
+              trigger: {
+                date: new Date(
+                  notificationDate.getFullYear(),
+                  notificationDate.getMonth(),
+                  notificationDate.getDate(),
+                  10,
+                  0,
+                  0
+                )
+              }
+            });
+            console.log(
+              `Notification scheduled for ${contact.username} on ${notificationDate}`
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error scheduling notifications:", error);
     }
   };
 
@@ -112,21 +149,25 @@ export default function CelebrationsScreen() {
       />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
-          Consultez vos contacts
+          Check your contacts
         </Text>
       </BlurView>
 
       <FlatList
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        data={filteredContacts} // Use filteredContacts here
-        keyExtractor={(item) => item.id} // Ensure each item has a unique key
+        data={filteredContacts}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           console.log(`Date for contact ${item.username}: ${item.date}`);
           return (
             <Pressable
               style={styles.itemRadius}
-              onPress={() => navigation.navigate("Page", { name: "NextPage" })}
+              onPress={() =>
+                navigation.navigate("GeneratedTextScreen", {
+                  prompt: "Generate text for " + item.username
+                })
+              }
             >
               <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
                 <View style={styles.group}>
@@ -143,18 +184,14 @@ export default function CelebrationsScreen() {
                 <Pressable
                   style={styles.generateButton}
                   onPress={() =>
-                    navigation.navigate("Home", { name: "HomeComponent" })
+                    navigation.navigate("GeneratedTextScreen", {
+                      prompt: "Generate text for " + item.username
+                    })
                   }
                 >
                   <Text style={styles.buttonText}>GENERATE</Text>
                 </Pressable>
-                <Pressable
-                  style={styles.callButton}
-                  // onPress={() =>
-                  //   navigation.navigate("Home", { name: "HomeComponent" })
-                  // }
-                  onPress={openContacts}
-                >
+                <Pressable style={styles.callButton} onPress={openContacts}>
                   <Text style={styles.buttonText}>CALL</Text>
                 </Pressable>
               </BlurView>
@@ -172,7 +209,6 @@ export default function CelebrationsScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

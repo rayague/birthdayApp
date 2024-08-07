@@ -116,7 +116,7 @@ export default function HomeScreen() {
       setImage(null);
       setSelectedLanguage("");
       fetchContacts();
-      navigation.navigate("LIST");
+      navigation.navigate("LISTS");
     } catch (error) {
       Alert.alert("Error", "Failed to save contact. Please try again.");
       console.error("Failed to save contact:", error);
@@ -443,7 +443,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
-    backgroundColor: "transparent"
+    backgroundColor: "transparent",
+    justifyContent: "center"
   },
   inputDatepicker: {
     borderColor: "dodgerblue",

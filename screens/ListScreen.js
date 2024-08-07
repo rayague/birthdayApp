@@ -13,7 +13,6 @@ import { Image } from "expo-image";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./LoadingScreen";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const image = require("../assets/images/picture10.jpg");
 
@@ -29,6 +28,7 @@ export default function ListScreen() {
     try {
       let storedContacts = await AsyncStorage.getItem("contacts");
       storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
+      console.log("Fetched Contacts:", storedContacts);
       setContacts(storedContacts);
     } catch (error) {
       console.error("Failed to fetch contacts:", error);
@@ -49,24 +49,39 @@ export default function ListScreen() {
     setRefreshing(false);
   };
 
-  const renderContact = ({ item }) => (
-    <Pressable
-      style={styles.itemRadius}
-      onPress={() => navigation.navigate("Page", { name: "NextPage" })}
-    >
-      <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
-        <View>
-          <Text style={styles.itemHeader}>{item.username}</Text>
-          <Text style={styles.itemText}>{item.relationship}</Text>
-        </View>
-        <Image
-          style={styles.imageStyle}
-          source={{ uri: item.image }}
-          transition={1000}
-        />
-      </BlurView>
-    </Pressable>
-  );
+  const renderContact = ({ item }) => {
+    return (
+      <Pressable
+        style={styles.itemRadius}
+        onPress={async () => {
+          console.log("Selecting contact ID:", item.id);
+          if (item.id) {
+            // Stocker les informations du contact dans AsyncStorage
+            await AsyncStorage.setItem("selectedContact", JSON.stringify(item));
+            navigation.navigate("Page");
+          } else {
+            console.warn("Item ID is undefined, cannot navigate.");
+          }
+        }}
+      >
+        <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
+          <View>
+            <Text style={styles.itemHeader}>{item.username}</Text>
+            <Text style={styles.itemText}>{item.relationship}</Text>
+          </View>
+          <Image
+            style={styles.imageStyle}
+            source={{ uri: item.image }}
+            transition={1000}
+          />
+        </BlurView>
+      </Pressable>
+    );
+  };
+
+  const keyExtractor = (item, index) => {
+    return item.id ? item.id.toString() : index.toString();
+  };
 
   return (
     <View style={styles.container}>
@@ -90,7 +105,7 @@ export default function ListScreen() {
         showsVerticalScrollIndicator={false}
         data={contacts}
         renderItem={renderContact}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

@@ -21,7 +21,12 @@
         "backgroundColor": "dodgerblue",
         "package": "the.contacts.adder"
       },
-      "permissions": ["READ_CONTACTS", "WRITE_CONTACTS"]
+      "permissions": [
+        "READ_CONTACTS",
+        "WRITE_CONTACTS",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
       "bundler": "metro",

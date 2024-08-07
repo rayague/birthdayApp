@@ -2,55 +2,66 @@ import {
   StyleSheet,
   Text,
   View,
-  ImageProps,
   ImageBackground,
-  FlatList,
-  Item,
-  Pressable,
   ScrollView,
-  TextInput
+  TextInput,
+  Pressable
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
-import { Picker } from "@react-native-picker/picker";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Assurez-vous que cette bibliothèque est installée
+import { Picker } from "@react-native-picker/picker"; // Assurez-vous que cette bibliothèque est installée
 
 const backgroundImage = require("../assets/images/picture10.jpg");
 
 export default function InfosScreen() {
   const navigation = useNavigation();
 
+  const [contact, setContact] = useState(null);
   const [username, setUsername] = useState("");
   const [mobile, setMobile] = useState("");
-  const [contacts, setContacts] = useState([]);
-  const [showContacts, setShowContacts] = useState(false);
   const [image, setImage] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState();
-  const [date, setDate] = useState(new Date(1598051730000));
-  const [mode, setMode] = useState("date");
+  const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+
+  const fetchContact = async () => {
+    try {
+      const storedContact = await AsyncStorage.getItem("selectedContact");
+      if (storedContact) {
+        const contactData = JSON.parse(storedContact);
+        setContact(contactData);
+        setUsername(contactData.username);
+        setMobile(contactData.mobile); // Assurez-vous que 'mobile' existe dans vos données
+        setImage(contactData.image); // Assurez-vous que 'image' existe dans vos données
+        setDate(new Date(contactData.date)); // Assurez-vous que 'date' existe dans vos données
+        setSelectedLanguage(contactData.relationship); // Remplacez par la clé correspondante
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchContact();
+  }, []);
 
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
+    const currentDate = selectedDate || date;
     setShow(false);
     setDate(currentDate);
   };
 
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
   const showDatepicker = () => {
-    showMode("date");
+    setShow(true);
   };
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -58,129 +69,156 @@ export default function InfosScreen() {
       quality: 1
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const saveContact = async () => {
+    console.log("Saving contact..."); // Ajoutez cette ligne
+    const updatedContact = {
+      ...contact,
+      username,
+      mobile,
+      image,
+      date,
+      relationship: selectedLanguage
+    };
+    await AsyncStorage.setItem(
+      "selectedContact",
+      JSON.stringify(updatedContact)
+    );
+    console.log("Contact saved:", updatedContact); // Ajoutez cette ligne
+    navigation.navigate("LISTS");
   };
 
   return (
     <View style={styles.container}>
       <ImageBackground
         imageStyle={{
-          // elevation: 10,
           resizeMode: "cover",
           justifyContent: "center"
         }}
         source={backgroundImage}
         style={styles.image}
-      ></ImageBackground>
-      <ScrollView>
-        <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
-          <Text style={[styles.text, { color: "#fff" }]}>
-            Consultez vos contats ici
-          </Text>
-        </BlurView>
-        <BlurView intensity={85} tint="dark" style={styles.blurInputContainer}>
-          <View style={styles.inputContainer}>
-            <Icon name="account" size={24} color="white" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="USERNAME"
-              placeholderTextColor="#fff"
-              value={username}
-              onChangeText={setUsername}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Icon name="cake" size={24} color="white" style={styles.icon} />
-            <Pressable style={styles.inputDatepicker} onPress={showDatepicker}>
-              <Text style={styles.datePickerText}>{date.toLocaleString()}</Text>
-            </Pressable>
-            {show && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode={mode}
-                is24Hour={true}
-                onChange={onChange}
+      >
+        <ScrollView>
+          <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
+            <Text style={[styles.text, { color: "#fff" }]}>
+              Consultez vos contacts ici
+            </Text>
+          </BlurView>
+
+          <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
+            {/* Champ Username */}
+            <View style={styles.inputContainer}>
+              <Icon
+                name="account"
+                size={24}
+                color="white"
+                style={styles.icon}
               />
-            )}
-          </View>
-          <View style={styles.inputContainer}>
-            <Icon
-              name="playlist-check"
-              size={24}
-              color="white"
-              style={styles.icon}
-            />
-            {/* <TextInput
-                placeholder="STATUS"
-                placeholderTextColor="#fff"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                /> */}
-            <Picker
-              style={styles.inputStatusPicker}
-              selectedValue={selectedLanguage}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedLanguage(itemValue)
-              }
-            >
-              <Picker.Item label="SON" value="SON" />
-              <Picker.Item label="DAUGHTER" value="DAUGHTER" />
-              <Picker.Item label="SISTER" value="SISTER" />
-              <Picker.Item label="BROTHER" value="BROTHER" />
-              <Picker.Item label="FRIEND" value="FRIEND" />
-              <Picker.Item label="NEIGHBOR" value="NEIGHBOR" />
-              <Picker.Item label="BESTFRIEND" value="BESTFRIEND" />
-              <Picker.Item label="BOYFRIEND" value="BOYFRIEND" />
-              <Picker.Item label="GIRLFRIEND" value="GIRLFRIEND" />
-              <Picker.Item label="HUSBAND" value="HUSBAND" />
-              <Picker.Item label="FATHER" value="FATHER" />
-              <Picker.Item label="MOTHER" value="MOTHER" />
-              <Picker.Item label="AUNTIE" value="AUNTIE" />
-              <Picker.Item label="UNCLE" value="UNCLE" />
-              <Picker.Item label="COUSIN" value="COUSIN" />
-              <Picker.Item label="NIECE" value="NIECE" />
-              <Picker.Item label="NEPHEW" value="NEPHEW" />
-              <Picker.Item label="GRAND-SON" value="GRAND-SON" />
-              <Picker.Item label="GRAND-DAUGHTER" value="GRAND-DAUGHTER" />
-              <Picker.Item label="GRAND-FATHER" value="GRAND-FATHER" />
-              <Picker.Item label="GRAND-MOTHER" value="GRAND-MOTHER" />
-              <Picker.Item label="GOD-FATHER" value="GOD-FATHER" />
-              <Picker.Item label="GOD-MOTHER" value="GOD-MOTHER" />
-            </Picker>
-          </View>
-          <View style={styles.inputContainer}>
-            <Icon name="image" size={24} color="white" style={styles.icon} />
-            {/* <TextInput
+              <TextInput
                 style={styles.input}
-                placeholder="PHOTO"
+                placeholder="USERNAME"
                 placeholderTextColor="#fff"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              /> */}
-            <Pressable style={styles.ImagePicker} onPress={pickImage}>
-              <Text style={styles.imagePickerText}> CHOISIR UNE IMAGE</Text>
+                value={username}
+                onChangeText={setUsername}
+              />
+            </View>
+
+            {/* Sélecteur de Date */}
+            <View style={styles.inputContainer}>
+              <Icon name="cake" size={24} color="white" style={styles.icon} />
+              <Pressable
+                style={styles.inputDatepicker}
+                onPress={showDatepicker}
+              >
+                <Text style={styles.datePickerText}>
+                  {date.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "long"
+                  })}
+                </Text>
+              </Pressable>
+              {show && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode="date"
+                  is24Hour={true}
+                  display="default"
+                  onChange={onChange}
+                />
+              )}
+            </View>
+
+            {/* Sélecteur de Statut */}
+            <View style={styles.inputContainer}>
+              <Icon
+                name="playlist-check"
+                size={24}
+                color="white"
+                style={styles.icon}
+              />
+              <Pressable style={styles.inputStatusPicker}>
+                <Picker
+                  style={styles.statusColor}
+                  selectedValue={selectedLanguage}
+                  onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
+                >
+                  <Picker.Item label="SON" value="SON" />
+                  <Picker.Item label="DAUGHTER" value="DAUGHTER" />
+                  <Picker.Item label="SISTER" value="SISTER" />
+                  <Picker.Item label="BROTHER" value="BROTHER" />
+                  <Picker.Item label="FRIEND" value="FRIEND" />
+                  <Picker.Item label="NEIGHBOR" value="NEIGHBOR" />
+                  <Picker.Item label="BESTFRIEND" value="BESTFRIEND" />
+                  <Picker.Item label="BOYFRIEND" value="BOYFRIEND" />
+                  <Picker.Item label="GIRLFRIEND" value="GIRLFRIEND" />
+                  <Picker.Item label="HUSBAND" value="HUSBAND" />
+                  <Picker.Item label="FATHER" value="FATHER" />
+                  <Picker.Item label="MOTHER" value="MOTHER" />
+                  <Picker.Item label="AUNTIE" value="AUNTIE" />
+                  <Picker.Item label="UNCLE" value="UNCLE" />
+                  <Picker.Item label="COUSIN" value="COUSIN" />
+                  <Picker.Item label="NIECE" value="NIECE" />
+                  <Picker.Item label="NEPHEW" value="NEPHEW" />
+                  <Picker.Item label="GRAND-SON" value="GRAND-SON" />
+                  <Picker.Item label="GRAND-DAUGHTER" value="GRAND-DAUGHTER" />
+                  <Picker.Item label="GRAND-FATHER" value="GRAND-FATHER" />
+                  <Picker.Item label="GRAND-MOTHER" value="GRAND-MOTHER" />
+                  <Picker.Item label="GOD-FATHER" value="GOD-FATHER" />
+                  <Picker.Item label="GOD-MOTHER" value="GOD-MOTHER" />
+                </Picker>
+              </Pressable>
+            </View>
+
+            {/* Choix d'Image */}
+            <View style={styles.imageContainer}>
+              <View style={styles.inputContainer}>
+                <Icon
+                  name="image"
+                  size={24}
+                  color="white"
+                  style={styles.icon}
+                />
+                <Pressable style={styles.ImagePicker} onPress={pickImage}>
+                  <Text style={styles.imagePickerText}>CHOISIR UNE IMAGE</Text>
+                </Pressable>
+              </View>
+              {image && (
+                <Image source={{ uri: image }} style={styles.imagePicked} />
+              )}
+            </View>
+
+            {/* Bouton de sauvegarde */}
+            <Pressable style={styles.onSubmitButton} onPress={saveContact}>
+              <Text style={styles.onSubmitText}>SAVE</Text>
             </Pressable>
-            {image && (
-              <Image source={{ uri: image }} style={styles.imagePicked} />
-            )}
-          </View>
-          <Pressable
-            style={styles.onSubmitButton}
-            // onPress={() =>
-            //   navigation.navigate("Inscription", { name: "RegisterScreen" })
-            // }
-          >
-            <Text style={styles.onSubmitText}>SAVE</Text>
-          </Pressable>
-        </BlurView>
-      </ScrollView>
+          </BlurView>
+        </ScrollView>
+      </ImageBackground>
     </View>
   );
 }
@@ -192,6 +230,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
+  imagePicked: {
+    height: 200,
+    width: "95%",
+    marginHorizontal: "auto",
+    borderRadius: 10,
+    borderWidth: 2
+  },
+  imageContainer: {
+    flexDirection: "column"
+    // alignItems: "center"
+    // marginVertical: 10
+  },
   image: {
     height: "100%",
     width: "100%",
@@ -200,6 +250,22 @@ const styles = StyleSheet.create({
     top: 0,
     resizeMode: "cover",
     justifyContent: "center"
+  },
+  blurInputContainer: {
+    width: "95%",
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    marginBottom: 100,
+    marginHorizontal: "auto"
   },
   blurContainer: {
     padding: 10,
@@ -217,224 +283,97 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: "center"
   },
-  item: {
-    padding: 20,
-    fontSize: 15,
-    marginTop: 5
-  },
-  itemContainer: {
+  inputContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: "auto",
-    width: "100%",
-    padding: 20,
-    marginVertical: 10,
-    textAlign: "center",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49
+    alignItems: "center",
+    marginVertical: 10
   },
-  listContainer: {
-    width: "95%",
-    marginHorizontal: 20,
-    marginBottom: 70
-  },
-  itemHeader: {
-    color: "white",
-    fontSize: 25,
-    fontWeight: "bold"
-  },
-  itemText: {
-    color: "white",
-    fontSize: 17,
-    fontWeight: 500
-  },
-  imageStyle: {
-    width: 70,
-    height: 70,
-    alignSelf: "flex-end",
-    borderRadius: 100,
-    objectFit: "cover"
+  icon: {
+    marginRight: 10
   },
   input: {
     borderColor: "dodgerblue",
     borderWidth: 1,
     height: 55,
     width: "90%",
-    // marginHorizontal: "auto",
     borderRadius: 10,
-    marginVertical: 5,
     paddingHorizontal: 10,
-    fontFamily: "sans-serif",
-    fontSize: 17,
-    outlineStyle: "none",
-    color: "white",
-    fontWeight: "bold",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49
-  },
-  ImagePicker: {
-    borderColor: "dodgerblue",
-    borderWidth: 1,
-    height: 55,
-    width: "90%",
-    borderRadius: 10,
-    marginVertical: 5,
-    padding: "auto",
-    fontFamily: "sans-serif",
-    fontSize: 17,
-    outlineStyle: "none",
-    color: "white",
-    fontWeight: "bold",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49,
-    alignContent: "center",
-    justifyContent: "center"
-  },
-  imagePickerText: {
-    textAlign: "center",
-    alignItems: "center",
-    color: "white",
-    fontFamily: "sans-serif",
-    fontWeight: "bold",
-    fontSize: 17
-  },
-  inputStatusPicker: {
-    borderColor: "dodgerblue",
-    borderWidth: 1,
-    height: 55,
-    width: "90%",
-    borderRadius: 10,
-    marginVertical: 5,
-    paddingHorizontal: 10,
-    fontFamily: "sans-serif",
-    fontSize: 17,
-    outlineStyle: "none",
-    color: "white",
-    fontWeight: "bold",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49,
-    backgroundColor: "transparent"
+    fontSize: 16,
+    backgroundColor: "transparent",
+    color: "white"
   },
   inputDatepicker: {
-    borderColor: "dodgerblue",
-    borderWidth: 1,
     height: 55,
     width: "90%",
     borderRadius: 10,
-    marginVertical: 5,
-    padding: "auto",
-    fontFamily: "sans-serif",
-    fontSize: 17,
-    outlineStyle: "none",
-    color: "white",
-    fontWeight: "bold",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49,
+    paddingHorizontal: 10,
+    fontSize: 16,
     backgroundColor: "transparent",
+    color: "white",
+    borderColor: "dodgerblue",
+    borderWidth: 1,
     justifyContent: "center"
   },
   datePickerText: {
-    textAlign: "center",
-    alignItems: "center",
+    color: "white"
+  },
+  inputStatusPicker: {
+    height: 55,
+    width: "90%",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    backgroundColor: "transparent",
     color: "white",
-    fontFamily: "sans-serif",
-    fontWeight: "bold",
-    fontSize: 17
-  },
-  imagePicked: {
-    width: 200,
-    height: 200
-  },
-  blurContainer: {
-    padding: 20,
-    margin: 10,
-    textAlign: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49
-  },
-  blurInputContainer: {
-    marginHorizontal: "auto",
-    width: "95%",
-    padding: 20,
-    textAlign: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49,
-    marginBottom: 100
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderColor: "white",
-    borderRadius: 20,
-    marginBottom: 10,
-    width: "100%"
-  },
-  icon: {
-    marginRight: 10
-  },
-  onSubmitButton: {
-    backgroundColor: "dodgerblue",
     borderColor: "dodgerblue",
     borderWidth: 1,
-    padding: 15,
-    width: "100%",
+    justifyContent: "center"
+  },
+  ImagePicker: {
+    height: 55,
+    width: "90%",
     borderRadius: 10,
-    marginTop: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 6
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49
+    paddingHorizontal: 10,
+    fontSize: 16,
+    backgroundColor: "transparent",
+    color: "white",
+    borderColor: "dodgerblue",
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  imagePickerText: {
+    color: "white"
+  },
+  // imagePicked: {
+  //   height: 100,
+  //   width: 100,
+  //   borderRadius: 10
+  //   // margin: 10
+  // },
+  onSubmitButton: {
+    height: 55,
+    width: "95%",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    backgroundColor: "dodgerblue",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 30,
+    marginHorizontal: "auto"
   },
   onSubmitText: {
     color: "white",
-    fontFamily: "sans-serif",
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 17
+    fontSize: 16,
+    fontWeight: "bold"
+  },
+  errorText: {
+    fontSize: 18,
+    color: "red",
+    textAlign: "center"
   }
 });
