@@ -15,13 +15,9 @@ import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./LoadingScreen";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as Linking from "expo-linking";
 import * as Contacts from "expo-contacts";
-import TextGenerator from "./TextGenerator";
-import * as Notifications from "expo-notifications";
-
-const image = require("../assets/images/picture10.jpg");
+import axios from "axios";
 
 export default function CelebrationsScreen() {
   const navigation = useNavigation();
@@ -53,8 +49,6 @@ export default function CelebrationsScreen() {
         setContacts(allContacts);
         setFilteredContacts(filtered);
         console.log("Contacts fetched:", filtered);
-
-        await scheduleNotificationsForContacts(filtered);
       } else {
         console.log("No contacts found in storage.");
       }
@@ -90,48 +84,6 @@ export default function CelebrationsScreen() {
       } else if (Platform.OS === "ios") {
         Linking.openURL("contacts://");
       }
-    }
-  };
-
-  const scheduleNotificationsForContacts = async (contacts) => {
-    try {
-      const today = new Date();
-      for (const contact of contacts) {
-        const [month, day, year] = contact.date.split("/").map(Number);
-        const contactDate = new Date(year, month - 1, day);
-        for (let i = 0; i < 5; i++) {
-          const notificationDate = new Date(contactDate);
-          notificationDate.setFullYear(today.getFullYear());
-          notificationDate.setDate(notificationDate.getDate() - i);
-
-          if (notificationDate > today) {
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: `Reminder for ${contact.username}`,
-                body: `${contact.username}'s birthday is in ${
-                  5 - i
-                } day(s)! Status: ${contact.status}`,
-                sound: true
-              },
-              trigger: {
-                date: new Date(
-                  notificationDate.getFullYear(),
-                  notificationDate.getMonth(),
-                  notificationDate.getDate(),
-                  10,
-                  0,
-                  0
-                )
-              }
-            });
-            console.log(
-              `Notification scheduled for ${contact.username} on ${notificationDate}`
-            );
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error scheduling notifications:", error);
     }
   };
 
@@ -181,16 +133,11 @@ export default function CelebrationsScreen() {
                     transition={1000}
                   />
                 </View>
-                <Pressable
-                  style={styles.generateButton}
-                  onPress={() =>
-                    navigation.navigate("GeneratedTextScreen", {
-                      prompt: "Generate text for " + item.username
-                    })
-                  }
-                >
+
+                <Pressable style={styles.generateButton}>
                   <Text style={styles.buttonText}>GENERATE</Text>
                 </Pressable>
+
                 <Pressable style={styles.callButton} onPress={openContacts}>
                   <Text style={styles.buttonText}>CALL</Text>
                 </Pressable>
