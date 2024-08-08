@@ -5,7 +5,8 @@ import {
   ImageBackground,
   FlatList,
   Pressable,
-  RefreshControl
+  RefreshControl,
+  Alert // Ajoutez Alert ici
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { BlurView } from "expo-blur";
@@ -49,6 +50,32 @@ export default function ListScreen() {
     setRefreshing(false);
   };
 
+  const handleDelete = async (id) => {
+    Alert.alert(
+      "Confirmer la suppression",
+      "Êtes-vous sûr de vouloir supprimer ce contact ?",
+      [
+        {
+          text: "Annuler",
+          style: "cancel"
+        },
+        {
+          text: "Supprimer",
+          onPress: async () => {
+            const updatedContacts = contacts.filter(
+              (contact) => contact.id !== id
+            );
+            await AsyncStorage.setItem(
+              "contacts",
+              JSON.stringify(updatedContacts)
+            );
+            setContacts(updatedContacts);
+          }
+        }
+      ]
+    );
+  };
+
   const renderContact = ({ item }) => {
     return (
       <Pressable
@@ -65,15 +92,24 @@ export default function ListScreen() {
         }}
       >
         <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
-          <View>
-            <Text style={styles.itemHeader}>{item.username}</Text>
-            <Text style={styles.itemText}>{item.relationship}</Text>
+          <View style={styles.viewContainer}>
+            <View>
+              <Text style={styles.itemHeader}>{item.username}</Text>
+              <Text style={styles.itemText}>{item.relationship}</Text>
+              <Image
+                style={styles.imageStyle}
+                source={{ uri: item.image }}
+                transition={1000}
+              />
+            </View>
+
+            <Pressable
+              onPress={() => handleDelete(item.id)}
+              style={styles.deleteButton}
+            >
+              <Text style={styles.deleteButtonText}>DELETE</Text>
+            </Pressable>
           </View>
-          <Image
-            style={styles.imageStyle}
-            source={{ uri: item.image }}
-            transition={1000}
-          />
         </BlurView>
       </Pressable>
     );
@@ -194,5 +230,21 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     borderRadius: 100,
     objectFit: "cover"
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10
+  },
+  deleteButtonText: {
+    color: "white",
+    textAlign: "center"
+  },
+  viewContainer: {
+    flex: 1, // Remplir l'espace disponible
+    flexDirection: "column", // Alignement en colonne
+    justifyContent: "space-between",
+    width: "100%"
   }
 });
