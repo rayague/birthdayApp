@@ -19,6 +19,8 @@ import CelebrationsScreen from "../screens/CelebrationsScreen";
 import LoadingScreen from "../screens/LoadingScreen";
 import GeneratedTextScreen from "../screens/GeneratedTextScreen";
 import { RegisterForPushNotificationsAsync } from "../screens/RegisterForPushNotificationsAsync"; // Assurez-vous que le chemin est correct
+// import seedData from "../screens/TextGenerator"; // Assure-toi que le chemin est correct
+// import FirstScreen from "../screens/FirstScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

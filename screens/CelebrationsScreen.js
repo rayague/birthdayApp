@@ -7,7 +7,10 @@ import {
   Pressable,
   RefreshControl,
   Platform,
-  Alert
+  Alert,
+  Modal,
+  Animated,
+  TouchableOpacity
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { BlurView } from "expo-blur";
@@ -17,7 +20,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./LoadingScreen";
 import * as Linking from "expo-linking";
 import * as Contacts from "expo-contacts";
+import { Ionicons } from "@expo/vector-icons";
+// import Clipboard from "@react-native-clipboard/clipboard";
+import * as Clipboard from "expo-clipboard";
+
 import axios from "axios";
+
+const image = require("../assets/images/picture10.jpg");
 
 export default function CelebrationsScreen() {
   const navigation = useNavigation();
@@ -25,6 +34,9 @@ export default function CelebrationsScreen() {
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [generatedMessage, setGeneratedMessage] = useState("");
+  const [animation] = useState(new Animated.Value(0));
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
@@ -87,6 +99,38 @@ export default function CelebrationsScreen() {
     }
   };
 
+  const generateMessage = async (relationship) => {
+    console.log(`Generating message for relationship: ${relationship}`);
+    try {
+      const storedMessages = await AsyncStorage.getItem(relationship);
+      const messages = storedMessages ? JSON.parse(storedMessages) : [];
+      console.log(`Messages retrieved for ${relationship}:`, messages);
+
+      if (messages.length > 0) {
+        const randomMessage =
+          messages[Math.floor(Math.random() * messages.length)];
+        console.log(`Random message selected: ${randomMessage.content}`);
+        setGeneratedMessage(randomMessage.content);
+        setModalVisible(true); // Ouvre le modal
+      } else {
+        console.log(`No messages found for ${relationship}.`);
+        Alert.alert(
+          "No messages found",
+          "No messages available for this relationship."
+        );
+      }
+    } catch (error) {
+      console.error("Error retrieving messages: ", error);
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (generatedMessage) {
+      Clipboard.setString(generatedMessage);
+      console.log("Copied to clipboard!", generatedMessage);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LoadingScreen visible={loading} />
@@ -111,15 +155,17 @@ export default function CelebrationsScreen() {
         data={filteredContacts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
-          console.log(`Date for contact ${item.username}: ${item.date}`);
+          console.log(
+            `Rendering item: ${item.username}, relationship: ${item.relationship}`
+          );
           return (
             <Pressable
               style={styles.itemRadius}
-              onPress={() =>
+              onPress={() => {
                 navigation.navigate("GeneratedTextScreen", {
                   prompt: "Generate text for " + item.username
-                })
-              }
+                });
+              }}
             >
               <BlurView intensity={90} tint="dark" style={styles.itemContainer}>
                 <View style={styles.group}>
@@ -134,7 +180,13 @@ export default function CelebrationsScreen() {
                   />
                 </View>
 
-                <Pressable style={styles.generateButton}>
+                <Pressable
+                  style={styles.generateButton}
+                  onPress={() => {
+                    console.log(`Generate button pressed for ${item.username}`);
+                    generateMessage(item.relationship.toUpperCase());
+                  }}
+                >
                   <Text style={styles.buttonText}>GENERATE</Text>
                 </Pressable>
 
@@ -153,6 +205,26 @@ export default function CelebrationsScreen() {
           />
         }
       />
+      {/* Afficher le message généré avec animation */}
+      <Modal transparent={true} visible={modalVisible} animationType="slide">
+        <View style={styles.modalContainer}>
+          <BlurView intensity={90} tint="dark" style={styles.modalContent}>
+            <Text style={styles.generatedText}>{generatedMessage}</Text>
+            <TouchableOpacity
+              onPress={copyToClipboard}
+              style={styles.copyButton}
+            >
+              <Text style={styles.buttonText}>COPY TEXT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}
+            >
+              <Text style={styles.buttonText}>CLOSE</Text>
+            </TouchableOpacity>
+          </BlurView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -162,6 +234,47 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center"
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)"
+  },
+  modalContent: {
+    width: 300,
+    padding: 30,
+    borderRadius: 10,
+    alignItems: "center"
+  },
+  generatedText: {
+    fontSize: 19,
+    marginBottom: 40,
+    fontWeight: "bold",
+    color: "#fff"
+  },
+  copyButton: {
+    backgroundColor: "#9Bd35A",
+    width: "100%",
+    justifyContent: "center",
+    textAlign: "center",
+    textTransform: "capitalize",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10
+  },
+  closeButton: {
+    backgroundColor: "#ff4d4d",
+    justifyContent: "center",
+    textAlign: "center",
+    textTransform: "capitalize",
+    padding: 10,
+    borderRadius: 5,
+    width: "100%"
+  },
+  // copyButton: {
+  //   marginTop: 10, // Marges pour l'icône de copie
+  //   padding: 5
+  // },
   image: {
     height: "100%",
     width: "100%",
@@ -267,6 +380,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 18
+    fontSize: 18,
+    textAlign: "center"
   }
 });

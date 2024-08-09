@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const son = [
   {
@@ -777,6 +778,509 @@ const son = [
     id: 155,
     content:
       "Happy birthday, my little miracle! Your presence brings so much joy into my life. May your day be filled with love."
+  }
+];
+
+const brother = [
+  {
+    id: 1,
+    content:
+      "Happy birthday to my amazing brother! Your strength and support are invaluable. May this year bring you everything you desire."
+  },
+  {
+    id: 2,
+    content:
+      "Wishing you a fantastic birthday, dear brother! You are not just my sibling but also my greatest ally. Enjoy your special day to the fullest!"
+  },
+  {
+    id: 3,
+    content:
+      "Happy birthday to the coolest brother ever! Your adventurous spirit inspires me every day. May your year be filled with thrilling experiences!"
+  },
+  {
+    id: 4,
+    content:
+      "To my brother on your special day: Thank you for always being there for me. May this birthday bring you immense joy and laughter."
+  },
+  {
+    id: 5,
+    content:
+      "Happy birthday, bro! Your wisdom and kindness shine bright. Wishing you all the happiness in the world today and always."
+  },
+  {
+    id: 6,
+    content:
+      "Cheers to my brother on his birthday! You are a true gift to our family. May your day be as awesome as you are."
+  },
+  {
+    id: 7,
+    content:
+      "Happy birthday, brother! Your courage and determination inspire me every day. May this year be filled with success and fulfillment."
+  },
+  {
+    id: 8,
+    content:
+      "To my incredible brother: Happy birthday! May your journey ahead be filled with adventures, love, and happiness."
+  },
+  {
+    id: 9,
+    content:
+      "Wishing you a wonderful birthday, dear brother! Your laughter lights up our lives. May your day be filled with joy and cheer."
+  },
+  {
+    id: 10,
+    content:
+      "Happy birthday to my brother! Your resilience and strength are admirable. May this year bring you closer to your dreams."
+  },
+  {
+    id: 11,
+    content:
+      "Cheers to my brother on his special day! Your kindness and compassion are unmatched. Wishing you a year full of blessings."
+  },
+  {
+    id: 12,
+    content:
+      "Happy birthday, bro! Your unique perspective on life is refreshing. May you continue to inspire those around you."
+  },
+  {
+    id: 13,
+    content:
+      "To my brother: Happy birthday! Your adventurous spirit and zest for life are contagious. Enjoy every moment of your special day!"
+  },
+  {
+    id: 14,
+    content:
+      "Wishing you a fantastic birthday, brother! May this year bring you endless opportunities and adventures."
+  },
+  {
+    id: 15,
+    content:
+      "Happy birthday to the best brother ever! Your unwavering support means the world to me. Have an amazing day!"
+  },
+  {
+    id: 16,
+    content:
+      "Cheers to my brother on his birthday! You are a true blessing in my life. May your day be filled with love and laughter."
+  },
+  {
+    id: 17,
+    content:
+      "Happy birthday, dear brother! Your strength and perseverance inspire me every day. Wishing you all the best today and always."
+  },
+  {
+    id: 18,
+    content:
+      "To my amazing brother: Happy birthday! May your day be filled with joy, and your year ahead be full of accomplishments."
+  },
+  {
+    id: 19,
+    content:
+      "Wishing you a wonderful birthday, brother! Your humor and spirit bring happiness to everyone around you."
+  },
+  {
+    id: 20,
+    content:
+      "Happy birthday, bro! Your dedication and passion are truly inspiring. May this year be your best one yet!"
+  },
+  {
+    id: 21,
+    content:
+      "To my brother on your special day: Your love and support have shaped who I am today. Have a fantastic birthday!"
+  },
+  {
+    id: 22,
+    content:
+      "Cheers to you on your birthday, brother! Your adventurous spirit lights up our lives. Enjoy every moment!"
+  },
+  {
+    id: 23,
+    content:
+      "Happy birthday to my wonderful brother! Your laughter and joy are infectious. Wishing you all the happiness in the world."
+  },
+  {
+    id: 24,
+    content:
+      "Wishing you a fabulous birthday, brother! Your strength and wisdom are a guiding light in my life."
+  },
+  {
+    id: 25,
+    content:
+      "Happy birthday, dear brother! Your determination and courage are an inspiration to us all. Enjoy your special day!"
+  },
+  {
+    id: 26,
+    content:
+      "To my brother: Happy birthday! May this year bring you closer to your dreams and fill your life with joy."
+  },
+  {
+    id: 27,
+    content:
+      "Cheers to my brother on his birthday! Your friendship means everything to me. Have a day filled with joy and laughter."
+  },
+  {
+    id: 28,
+    content:
+      "Happy birthday to my amazing brother! Your kind heart and spirit brighten every room you enter."
+  },
+  {
+    id: 29,
+    content:
+      "Wishing you a wonderful birthday, brother! May your day be as fantastic as you are."
+  },
+  {
+    id: 30,
+    content:
+      "Happy birthday, bro! Your adventurous spirit inspires me to be better. Enjoy your special day to the fullest!"
+  },
+  {
+    id: 31,
+    content:
+      "To my brother on your birthday: Thank you for always being there for me. May your day be filled with love and happiness."
+  },
+  {
+    id: 32,
+    content:
+      "Cheers to you on your special day, brother! Your strength and determination are truly admirable."
+  },
+  {
+    id: 33,
+    content:
+      "Happy birthday to the best brother! Your laughter brings joy to everyone around you. Enjoy your day!"
+  },
+  {
+    id: 34,
+    content:
+      "Wishing you a fabulous birthday, dear brother! Your resilience and kindness inspire everyone you meet."
+  },
+  {
+    id: 35,
+    content:
+      "Happy birthday, brother! Your passion for life is contagious. May your year ahead be filled with excitement."
+  },
+  {
+    id: 36,
+    content:
+      "To my amazing brother: Happy birthday! May your journey ahead be filled with love, laughter, and happiness."
+  },
+  {
+    id: 37,
+    content:
+      "Cheers to my brother on his birthday! Your spirit and determination make the world a better place."
+  },
+  {
+    id: 38,
+    content:
+      "Happy birthday, dear brother! Your support and love mean the world to me. Have an incredible day!"
+  },
+  {
+    id: 39,
+    content:
+      "Wishing you a wonderful birthday, brother! Your unique personality lights up our lives."
+  },
+  {
+    id: 40,
+    content:
+      "Happy birthday, bro! Your strength and wisdom are an inspiration. May your day be filled with joy."
+  },
+  {
+    id: 41,
+    content:
+      "To my brother on your special day: Thank you for being a constant source of support. Enjoy every moment!"
+  },
+  {
+    id: 42,
+    content:
+      "Cheers to my brother on his birthday! Your adventurous nature is a blessing to our family."
+  },
+  {
+    id: 43,
+    content:
+      "Happy birthday to my wonderful brother! Your laughter and joy are a gift to everyone around you."
+  },
+  {
+    id: 44,
+    content:
+      "Wishing you a fabulous birthday, brother! Your strength and determination inspire us all."
+  },
+  {
+    id: 45,
+    content:
+      "Happy birthday, dear brother! May this year bring you endless opportunities and happiness."
+  },
+  {
+    id: 46,
+    content:
+      "To my brother: Happy birthday! Your love and support have shaped who I am today. Have an amazing day!"
+  },
+  {
+    id: 47,
+    content:
+      "Cheers to you on your birthday, brother! Your adventurous spirit lights up our lives. Enjoy every moment!"
+  },
+  {
+    id: 48,
+    content:
+      "Happy birthday to my amazing brother! Your kind heart and spirit brighten every room you enter."
+  },
+  {
+    id: 49,
+    content:
+      "Wishing you a wonderful birthday, brother! May your day be as fantastic as you are."
+  },
+  {
+    id: 50,
+    content:
+      "Happy birthday, bro! Your adventurous spirit inspires me to be better. Enjoy your special day to the fullest!"
+  },
+  {
+    id: 51,
+    content:
+      "To my brother on your birthday: Thank you for always being there for me. May your day be filled with love and happiness."
+  },
+  {
+    id: 52,
+    content:
+      "Cheers to you on your special day, brother! Your strength and determination are truly admirable."
+  },
+  {
+    id: 53,
+    content:
+      "Happy birthday to the best brother! Your laughter brings joy to everyone around you. Enjoy your day!"
+  },
+  {
+    id: 54,
+    content:
+      "Wishing you a fabulous birthday, dear brother! Your resilience and kindness inspire everyone you meet."
+  },
+  {
+    id: 55,
+    content:
+      "Happy birthday, brother! Your passion for life is contagious. May your year ahead be filled with excitement."
+  },
+  {
+    id: 56,
+    content:
+      "To my amazing brother: Happy birthday! May your journey ahead be filled with love, laughter, and happiness."
+  },
+  {
+    id: 57,
+    content:
+      "Cheers to my brother on his birthday! Your spirit and determination make the world a better place."
+  },
+  {
+    id: 58,
+    content:
+      "Happy birthday, dear brother! Your support and love mean the world to me. Have an incredible day!"
+  },
+  {
+    id: 59,
+    content:
+      "Wishing you a wonderful birthday, brother! Your unique personality lights up our lives."
+  },
+  {
+    id: 60,
+    content:
+      "Happy birthday, bro! Your strength and wisdom are an inspiration. May your day be filled with joy."
+  },
+  {
+    id: 61,
+    content:
+      "To my brother on your special day: Thank you for being a constant source of support. Enjoy every moment!"
+  },
+  {
+    id: 62,
+    content:
+      "Cheers to my brother on his birthday! Your adventurous nature is a blessing to our family."
+  },
+  {
+    id: 63,
+    content:
+      "Happy birthday to my wonderful brother! Your laughter and joy are a gift to everyone around you."
+  },
+  {
+    id: 64,
+    content:
+      "Wishing you a fabulous birthday, brother! Your strength and determination inspire us all."
+  },
+  {
+    id: 65,
+    content:
+      "Happy birthday, dear brother! May this year bring you endless opportunities and happiness."
+  },
+  {
+    id: 66,
+    content:
+      "To my brother: Happy birthday! Your love and support have shaped who I am today. Have an amazing day!"
+  },
+  {
+    id: 67,
+    content:
+      "Cheers to you on your birthday, brother! Your adventurous spirit lights up our lives. Enjoy every moment!"
+  },
+  {
+    id: 68,
+    content:
+      "Happy birthday to my amazing brother! Your kind heart and spirit brighten every room you enter."
+  },
+  {
+    id: 69,
+    content:
+      "Wishing you a wonderful birthday, brother! May your day be as fantastic as you are."
+  },
+  {
+    id: 70,
+    content:
+      "Happy birthday, bro! Your adventurous spirit inspires me to be better. Enjoy your special day to the fullest!"
+  },
+  {
+    id: 71,
+    content:
+      "To my brother on your birthday: Thank you for always being there for me. May your day be filled with love and happiness."
+  },
+  {
+    id: 72,
+    content:
+      "Cheers to you on your special day, brother! Your strength and determination are truly admirable."
+  },
+  {
+    id: 73,
+    content:
+      "Happy birthday to the best brother! Your laughter brings joy to everyone around you. Enjoy your day!"
+  },
+  {
+    id: 74,
+    content:
+      "Wishing you a fabulous birthday, dear brother! Your resilience and kindness inspire everyone you meet."
+  },
+  {
+    id: 75,
+    content:
+      "Happy birthday, brother! Your passion for life is contagious. May your year ahead be filled with excitement."
+  },
+  {
+    id: 76,
+    content:
+      "To my amazing brother: Happy birthday! May your journey ahead be filled with love, laughter, and happiness."
+  },
+  {
+    id: 77,
+    content:
+      "Cheers to my brother on his birthday! Your spirit and determination make the world a better place."
+  },
+  {
+    id: 78,
+    content:
+      "Happy birthday, dear brother! Your support and love mean the world to me. Have an incredible day!"
+  },
+  {
+    id: 79,
+    content:
+      "Wishing you a wonderful birthday, brother! Your unique personality lights up our lives."
+  },
+  {
+    id: 80,
+    content:
+      "Happy birthday, bro! Your strength and wisdom are an inspiration. May your day be filled with joy."
+  },
+  {
+    id: 81,
+    content:
+      "To my brother on your special day: Thank you for being a constant source of support. Enjoy every moment!"
+  },
+  {
+    id: 82,
+    content:
+      "Cheers to my brother on his birthday! Your adventurous nature is a blessing to our family."
+  },
+  {
+    id: 83,
+    content:
+      "Happy birthday to my wonderful brother! Your laughter and joy are a gift to everyone around you."
+  },
+  {
+    id: 84,
+    content:
+      "Wishing you a fabulous birthday, brother! Your strength and determination inspire us all."
+  },
+  {
+    id: 85,
+    content:
+      "Happy birthday, dear brother! May this year bring you endless opportunities and happiness."
+  },
+  {
+    id: 86,
+    content:
+      "To my brother: Happy birthday! Your love and support have shaped who I am today. Have an amazing day!"
+  },
+  {
+    id: 87,
+    content:
+      "Cheers to you on your birthday, brother! Your adventurous spirit lights up our lives. Enjoy every moment!"
+  },
+  {
+    id: 88,
+    content:
+      "Happy birthday to my amazing brother! Your kind heart and spirit brighten every room you enter."
+  },
+  {
+    id: 89,
+    content:
+      "Wishing you a wonderful birthday, brother! May your day be as fantastic as you are."
+  },
+  {
+    id: 90,
+    content:
+      "Happy birthday, bro! Your adventurous spirit inspires me to be better. Enjoy your special day to the fullest!"
+  },
+  {
+    id: 91,
+    content:
+      "To my brother on your birthday: Thank you for always being there for me. May your day be filled with love and happiness."
+  },
+  {
+    id: 92,
+    content:
+      "Cheers to you on your special day, brother! Your strength and determination are truly admirable."
+  },
+  {
+    id: 93,
+    content:
+      "Happy birthday to the best brother! Your laughter brings joy to everyone around you. Enjoy your day!"
+  },
+  {
+    id: 94,
+    content:
+      "Wishing you a fabulous birthday, dear brother! Your resilience and kindness inspire everyone you meet."
+  },
+  {
+    id: 95,
+    content:
+      "Happy birthday, brother! Your passion for life is contagious. May your year ahead be filled with excitement."
+  },
+  {
+    id: 96,
+    content:
+      "To my amazing brother: Happy birthday! May your journey ahead be filled with love, laughter, and happiness."
+  },
+  {
+    id: 97,
+    content:
+      "Cheers to my brother on his birthday! Your spirit and determination make the world a better place."
+  },
+  {
+    id: 98,
+    content:
+      "Happy birthday, dear brother! Your support and love mean the world to me. Have an incredible day!"
+  },
+  {
+    id: 99,
+    content:
+      "Wishing you a wonderful birthday, brother! Your unique personality lights up our lives."
+  },
+  {
+    id: 100,
+    content:
+      "Happy birthday, bro! Your strength and wisdom are an inspiration. May your day be filled with joy."
   }
 ];
 
@@ -3162,7 +3666,7 @@ const sister = [
   }
 ];
 
-const bestFriend = [
+const bestfriend = [
   {
     id: 1,
     content:
@@ -11064,6 +11568,509 @@ const godFather = [
   // Add more messages as needed to reach 100
 ];
 
+const cousin = [
+  {
+    id: 1,
+    content:
+      "Happy birthday to my awesome cousin! Your energy and enthusiasm are contagious. Have a fantastic day!"
+  },
+  {
+    id: 2,
+    content:
+      "Wishing you a wonderful birthday, dear cousin! May this year be filled with adventures and happiness."
+  },
+  {
+    id: 3,
+    content:
+      "Happy birthday to my favorite cousin! Your spirit brings joy to our family gatherings. Enjoy your special day!"
+  },
+  {
+    id: 4,
+    content:
+      "To my cousin on your birthday: Thank you for being such a fun and loving part of my life. Have an amazing day!"
+  },
+  {
+    id: 5,
+    content:
+      "Happy birthday, cousin! Your laughter and kindness light up our lives. Wishing you all the best today!"
+  },
+  {
+    id: 6,
+    content:
+      "Cheers to you on your special day, cousin! May your birthday be filled with love and laughter."
+  },
+  {
+    id: 7,
+    content:
+      "Happy birthday to my wonderful cousin! Your creativity and spirit inspire me. Enjoy your day to the fullest!"
+  },
+  {
+    id: 8,
+    content:
+      "To my amazing cousin: Happy birthday! May your year ahead be filled with exciting opportunities."
+  },
+  {
+    id: 9,
+    content:
+      "Wishing you a fantastic birthday, cousin! Your positivity is infectious. May this year bring you joy!"
+  },
+  {
+    id: 10,
+    content:
+      "Happy birthday to the coolest cousin ever! Your adventurous nature makes family gatherings so much fun."
+  },
+  {
+    id: 11,
+    content:
+      "Cheers to my cousin on your birthday! Your unique perspective on life is refreshing. Have an awesome day!"
+  },
+  {
+    id: 12,
+    content:
+      "Happy birthday, cousin! Your kindness and generosity are unmatched. Wishing you a year full of blessings."
+  },
+  {
+    id: 13,
+    content:
+      "To my cousin on your special day: Thank you for always being there for me. May your birthday be as wonderful as you are!"
+  },
+  {
+    id: 14,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your sense of humor brightens our days. Enjoy your celebrations!"
+  },
+  {
+    id: 15,
+    content:
+      "Happy birthday, dear cousin! Your strength and determination inspire me. May this year be your best one yet!"
+  },
+  {
+    id: 16,
+    content:
+      "To my cousin: Happy birthday! May your life be filled with love, laughter, and unforgettable moments."
+  },
+  {
+    id: 17,
+    content:
+      "Cheers to my cousin on your birthday! Your vibrant spirit brings joy to everyone around you."
+  },
+  {
+    id: 18,
+    content:
+      "Happy birthday to my beloved cousin! Your support means the world to me. Have a fantastic day!"
+  },
+  {
+    id: 19,
+    content:
+      "Wishing you a fabulous birthday, cousin! Your adventurous spirit is a blessing to our family."
+  },
+  {
+    id: 20,
+    content:
+      "Happy birthday, cousin! Your laughter fills our lives with joy. May your day be as wonderful as you are!"
+  },
+  {
+    id: 21,
+    content:
+      "To my cousin on your special day: Your love and friendship are treasures I cherish. Enjoy every moment!"
+  },
+  {
+    id: 22,
+    content:
+      "Cheers to my cousin on your birthday! Your enthusiasm for life is contagious. Have an amazing day!"
+  },
+  {
+    id: 23,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire those around you. Enjoy your day!"
+  },
+  {
+    id: 24,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your unique personality brightens our family gatherings."
+  },
+  {
+    id: 25,
+    content:
+      "Happy birthday, dear cousin! Your spirit and determination make you truly special. Have an unforgettable day!"
+  },
+  {
+    id: 26,
+    content:
+      "To my cousin: Happy birthday! May your journey ahead be filled with love, laughter, and joy."
+  },
+  {
+    id: 27,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous nature brings excitement to our family."
+  },
+  {
+    id: 28,
+    content:
+      "Happy birthday to my fabulous cousin! Your kindness and humor light up our lives. Enjoy your special day!"
+  },
+  {
+    id: 29,
+    content:
+      "Wishing you a fantastic birthday, cousin! Your resilience and positivity inspire everyone you meet."
+  },
+  {
+    id: 30,
+    content:
+      "Happy birthday, cousin! Your laughter and love are gifts to our family. Have an amazing celebration!"
+  },
+  {
+    id: 31,
+    content:
+      "To my cousin on your special day: Thank you for being such a wonderful friend. Enjoy every moment!"
+  },
+  {
+    id: 32,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous spirit makes every family gathering memorable."
+  },
+  {
+    id: 33,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire everyone around you."
+  },
+  {
+    id: 34,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your positive energy lights up our lives."
+  },
+  {
+    id: 35,
+    content:
+      "Happy birthday, dear cousin! Your strength and determination inspire me every day. Enjoy your special day!"
+  },
+  {
+    id: 36,
+    content:
+      "To my cousin: Happy birthday! May your life be filled with love, laughter, and unforgettable moments."
+  },
+  {
+    id: 37,
+    content:
+      "Cheers to my cousin on your birthday! Your vibrant spirit brings joy to everyone around you."
+  },
+  {
+    id: 38,
+    content:
+      "Happy birthday to my beloved cousin! Your support means the world to me. Have a fantastic day!"
+  },
+  {
+    id: 39,
+    content:
+      "Wishing you a fabulous birthday, cousin! Your adventurous spirit is a blessing to our family."
+  },
+  {
+    id: 40,
+    content:
+      "Happy birthday, cousin! Your laughter fills our lives with joy. May your day be as wonderful as you are!"
+  },
+  {
+    id: 41,
+    content:
+      "To my cousin on your special day: Your love and friendship are treasures I cherish. Enjoy every moment!"
+  },
+  {
+    id: 42,
+    content:
+      "Cheers to my cousin on your birthday! Your enthusiasm for life is contagious. Have an amazing day!"
+  },
+  {
+    id: 43,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire those around you. Enjoy your day!"
+  },
+  {
+    id: 44,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your unique personality brightens our family gatherings."
+  },
+  {
+    id: 45,
+    content:
+      "Happy birthday, dear cousin! Your spirit and determination make you truly special. Have an unforgettable day!"
+  },
+  {
+    id: 46,
+    content:
+      "To my cousin: Happy birthday! May your journey ahead be filled with love, laughter, and joy."
+  },
+  {
+    id: 47,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous nature brings excitement to our family."
+  },
+  {
+    id: 48,
+    content:
+      "Happy birthday to my fabulous cousin! Your kindness and humor light up our lives. Enjoy your special day!"
+  },
+  {
+    id: 49,
+    content:
+      "Wishing you a fantastic birthday, cousin! Your resilience and positivity inspire everyone you meet."
+  },
+  {
+    id: 50,
+    content:
+      "Happy birthday, cousin! Your laughter and love are gifts to our family. Have an amazing celebration!"
+  },
+  {
+    id: 51,
+    content:
+      "To my cousin on your special day: Thank you for being such a wonderful friend. Enjoy every moment!"
+  },
+  {
+    id: 52,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous spirit makes every family gathering memorable."
+  },
+  {
+    id: 53,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire everyone around you."
+  },
+  {
+    id: 54,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your positive energy lights up our lives."
+  },
+  {
+    id: 55,
+    content:
+      "Happy birthday, dear cousin! Your strength and determination inspire me every day. Enjoy your special day!"
+  },
+  {
+    id: 56,
+    content:
+      "To my cousin: Happy birthday! May your life be filled with love, laughter, and unforgettable moments."
+  },
+  {
+    id: 57,
+    content:
+      "Cheers to my cousin on your birthday! Your vibrant spirit brings joy to everyone around you."
+  },
+  {
+    id: 58,
+    content:
+      "Happy birthday to my beloved cousin! Your support means the world to me. Have a fantastic day!"
+  },
+  {
+    id: 59,
+    content:
+      "Wishing you a fabulous birthday, cousin! Your adventurous spirit is a blessing to our family."
+  },
+  {
+    id: 60,
+    content:
+      "Happy birthday, cousin! Your laughter fills our lives with joy. May your day be as wonderful as you are!"
+  },
+  {
+    id: 61,
+    content:
+      "To my cousin on your special day: Your love and friendship are treasures I cherish. Enjoy every moment!"
+  },
+  {
+    id: 62,
+    content:
+      "Cheers to my cousin on your birthday! Your enthusiasm for life is contagious. Have an amazing day!"
+  },
+  {
+    id: 63,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire those around you. Enjoy your day!"
+  },
+  {
+    id: 64,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your unique personality brightens our family gatherings."
+  },
+  {
+    id: 65,
+    content:
+      "Happy birthday, dear cousin! Your spirit and determination make you truly special. Have an unforgettable day!"
+  },
+  {
+    id: 66,
+    content:
+      "To my cousin: Happy birthday! May your journey ahead be filled with love, laughter, and joy."
+  },
+  {
+    id: 67,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous nature brings excitement to our family."
+  },
+  {
+    id: 68,
+    content:
+      "Happy birthday to my fabulous cousin! Your kindness and humor light up our lives. Enjoy your special day!"
+  },
+  {
+    id: 69,
+    content:
+      "Wishing you a fantastic birthday, cousin! Your resilience and positivity inspire everyone you meet."
+  },
+  {
+    id: 70,
+    content:
+      "Happy birthday, cousin! Your laughter and love are gifts to our family. Have an amazing celebration!"
+  },
+  {
+    id: 71,
+    content:
+      "To my cousin on your special day: Thank you for being such a wonderful friend. Enjoy every moment!"
+  },
+  {
+    id: 72,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous spirit makes every family gathering memorable."
+  },
+  {
+    id: 73,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire everyone around you."
+  },
+  {
+    id: 74,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your positive energy lights up our lives."
+  },
+  {
+    id: 75,
+    content:
+      "Happy birthday, dear cousin! Your strength and determination inspire me every day. Enjoy your special day!"
+  },
+  {
+    id: 76,
+    content:
+      "To my cousin: Happy birthday! May your life be filled with love, laughter, and unforgettable moments."
+  },
+  {
+    id: 77,
+    content:
+      "Cheers to my cousin on your birthday! Your vibrant spirit brings joy to everyone around you."
+  },
+  {
+    id: 78,
+    content:
+      "Happy birthday to my beloved cousin! Your support means the world to me. Have a fantastic day!"
+  },
+  {
+    id: 79,
+    content:
+      "Wishing you a fabulous birthday, cousin! Your adventurous spirit is a blessing to our family."
+  },
+  {
+    id: 80,
+    content:
+      "Happy birthday, cousin! Your laughter fills our lives with joy. May your day be as wonderful as you are!"
+  },
+  {
+    id: 81,
+    content:
+      "To my cousin on your special day: Your love and friendship are treasures I cherish. Enjoy every moment!"
+  },
+  {
+    id: 82,
+    content:
+      "Cheers to my cousin on your birthday! Your enthusiasm for life is contagious. Have an amazing day!"
+  },
+  {
+    id: 83,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire those around you. Enjoy your day!"
+  },
+  {
+    id: 84,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your unique personality brightens our family gatherings."
+  },
+  {
+    id: 85,
+    content:
+      "Happy birthday, dear cousin! Your spirit and determination make you truly special. Have an unforgettable day!"
+  },
+  {
+    id: 86,
+    content:
+      "To my cousin: Happy birthday! May your journey ahead be filled with love, laughter, and joy."
+  },
+  {
+    id: 87,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous nature brings excitement to our family."
+  },
+  {
+    id: 88,
+    content:
+      "Happy birthday to my fabulous cousin! Your kindness and humor light up our lives. Enjoy your special day!"
+  },
+  {
+    id: 89,
+    content:
+      "Wishing you a fantastic birthday, cousin! Your resilience and positivity inspire everyone you meet."
+  },
+  {
+    id: 90,
+    content:
+      "Happy birthday, cousin! Your laughter and love are gifts to our family. Have an amazing celebration!"
+  },
+  {
+    id: 91,
+    content:
+      "To my cousin on your special day: Thank you for being such a wonderful friend. Enjoy every moment!"
+  },
+  {
+    id: 92,
+    content:
+      "Cheers to my cousin on your birthday! Your adventurous spirit makes every family gathering memorable."
+  },
+  {
+    id: 93,
+    content:
+      "Happy birthday to my incredible cousin! Your creativity and passion inspire everyone around you."
+  },
+  {
+    id: 94,
+    content:
+      "Wishing you a wonderful birthday, cousin! Your positive energy lights up our lives."
+  },
+  {
+    id: 95,
+    content:
+      "Happy birthday, dear cousin! Your strength and determination inspire me every day. Enjoy your special day!"
+  },
+  {
+    id: 96,
+    content:
+      "To my cousin: Happy birthday! May your life be filled with love, laughter, and unforgettable moments."
+  },
+  {
+    id: 97,
+    content:
+      "Cheers to my cousin on your birthday! Your vibrant spirit brings joy to everyone around you."
+  },
+  {
+    id: 98,
+    content:
+      "Happy birthday to my beloved cousin! Your support means the world to me. Have a fantastic day!"
+  },
+  {
+    id: 99,
+    content:
+      "Wishing you a fabulous birthday, cousin! Your adventurous spirit is a blessing to our family."
+  },
+  {
+    id: 100,
+    content:
+      "Happy birthday, cousin! Your laughter fills our lives with joy. May your day be as wonderful as you are!"
+  }
+];
+
 const godMother = [
   {
     id: 1,
@@ -11567,59 +12574,57 @@ const godMother = [
   }
 ];
 
-export default function TextGenerator() {
-  useEffect(() => {
-    const seedData = async () => {
-      try {
-        console.log("Seeding data...");
+const seedData = async () => {
+  try {
+    const isSeeded = await AsyncStorage.getItem("dataSeeded");
 
-        // Seed pour chaque catégorie
-        const categories = [
-          { key: "SON", messages: son },
-          { key: "DAUGHTER", messages: daughter },
-          { key: "SISTER", messages: sister }, // Assure-toi d'ajouter les données
-          { key: "BROTHER", messages: brother },
-          { key: "FRIEND", messages: friend },
-          { key: "NEIGHBOR", messages: neighbor },
-          { key: "BESTFRIEND", messages: bestfriend },
-          { key: "BOYFRIEND", messages: boyfriend },
-          { key: "GIRLFRIEND", messages: girlfriend },
-          { key: "HUSBAND", messages: husband },
-          { key: "FATHER", messages: father },
-          { key: "MOTHER", messages: mother },
-          { key: "AUNTIE", messages: auntie },
-          { key: "UNCLE", messages: uncle },
-          { key: "COUSIN", messages: cousin },
-          { key: "NIECE", messages: niece },
-          { key: "NEPHEW", messages: nephew },
-          { key: "GRAND-SON", messages: grandSon },
-          { key: "GRAND-DAUGHTER", messages: grandDaughter },
-          { key: "GRAND-FATHER", messages: grandFather },
-          { key: "GRAND-MOTHER", messages: grandMother },
-          { key: "GOD-FATHER", messages: godFather },
-          { key: "GOD-MOTHER", messages: godMother }
-        ];
+    if (isSeeded) {
+      console.log("Data has already been seeded. Skipping...");
+      return; // Ne fais rien si les données sont déjà semées
+    }
 
-        for (const category of categories) {
-          console.log(`Inserting messages for ${category.key}...`);
-          await AsyncStorage.setItem(
-            category.key,
-            JSON.stringify(category.messages)
-          );
-          console.log(`${category.key} messages seeded successfully!`);
-        }
+    console.log("Seeding data...");
 
-        console.log("All data seeded successfully!");
-      } catch (error) {
-        console.error("Error seeding data: ", error);
-      }
-    };
+    const categories = [
+      { key: "SON", messages: son },
+      { key: "DAUGHTER", messages: daughter },
+      { key: "SISTER", messages: sister },
+      { key: "BROTHER", messages: brother },
+      { key: "FRIEND", messages: friend },
+      { key: "NEIGHBOR", messages: neighbor },
+      { key: "BESTFRIEND", messages: bestfriend },
+      { key: "BOYFRIEND", messages: boyfriend },
+      { key: "GIRLFRIEND", messages: girlfriend },
+      { key: "HUSBAND", messages: husband },
+      { key: "FATHER", messages: father },
+      { key: "MOTHER", messages: mother },
+      { key: "AUNTIE", messages: auntie },
+      { key: "UNCLE", messages: uncle },
+      { key: "COUSIN", messages: cousin },
+      { key: "NIECE", messages: niece },
+      { key: "NEPHEW", messages: nephew },
+      { key: "GRAND-SON", messages: grandSon },
+      { key: "GRAND-DAUGHTER", messages: grandDaughter },
+      { key: "GRAND-FATHER", messages: grandFather },
+      { key: "GRAND-MOTHER", messages: grandMother },
+      { key: "GOD-FATHER", messages: godFather },
+      { key: "GOD-MOTHER", messages: godMother }
+    ];
 
-    seedData();
-  }, []);
-  return (
-    <View>
-      <Text>TextGenerator component</Text>
-    </View>
-  );
-}
+    for (const category of categories) {
+      console.log(`Inserting messages for ${category.key}...`);
+      await AsyncStorage.setItem(
+        category.key,
+        JSON.stringify(category.messages)
+      );
+      console.log(`${category.key} messages seeded successfully!`);
+    }
+
+    await AsyncStorage.setItem("dataSeeded", "true");
+    console.log("All data seeded successfully!");
+  } catch (error) {
+    console.error("Error seeding data: ", error);
+  }
+};
+
+export default seedData;
