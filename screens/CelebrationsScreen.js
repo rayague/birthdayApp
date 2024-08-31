@@ -194,7 +194,7 @@ export default function CelebrationsScreen() {
       />
       <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
         <Text style={[styles.text, { color: "#fff" }]}>
-          Check your contacts
+          CHECK YOUR CONTACTS HERE
         </Text>
       </BlurView>
 
@@ -350,7 +350,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: "center"
   },
   item: {
     padding: 20,

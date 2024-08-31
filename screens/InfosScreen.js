@@ -40,6 +40,13 @@ export default function InfosScreen() {
         setMobile(contactData.mobile); // Assurez-vous que 'mobile' existe dans vos données
         setImage(contactData.image); // Assurez-vous que 'image' existe dans vos données
         setDate(new Date(contactData.date)); // Assurez-vous que 'date' existe dans vos données
+        // Assurez-vous que la date soit valide
+        const contactDate = new Date(contactData.date);
+        if (!isNaN(contactDate.getTime())) {
+          setDate(contactDate);
+        } else {
+          setDate(new Date()); // Ou utilisez une date par défaut
+        }
         setSelectedLanguage(contactData.relationship); // Remplacez par la clé correspondante
       }
     } catch (error) {
@@ -146,9 +153,10 @@ export default function InfosScreen() {
                 onPress={showDatepicker}
               >
                 <Text style={styles.datePickerText}>
-                  {date.toLocaleDateString("en-US", {
+                  {date.toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "long"
+                    // year: "numeric" // Vous pouvez ajouter l'année si nécessaire
                   })}
                 </Text>
               </Pressable>
