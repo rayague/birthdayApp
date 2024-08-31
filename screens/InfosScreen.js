@@ -75,7 +75,7 @@ export default function InfosScreen() {
   };
 
   const saveContact = async () => {
-    console.log("Saving contact..."); // Ajoutez cette ligne
+    console.log("Saving contact...");
     const updatedContact = {
       ...contact,
       username,
@@ -84,11 +84,22 @@ export default function InfosScreen() {
       date,
       relationship: selectedLanguage
     };
+
+    let storedContacts = await AsyncStorage.getItem("contacts");
+    storedContacts = storedContacts ? JSON.parse(storedContacts) : [];
+
+    // Remplacer le contact existant par le mis à jour
+    const updatedContacts = storedContacts.map((c) =>
+      c.id === updatedContact.id ? updatedContact : c
+    );
+
+    await AsyncStorage.setItem("contacts", JSON.stringify(updatedContacts));
     await AsyncStorage.setItem(
       "selectedContact",
       JSON.stringify(updatedContact)
     );
-    console.log("Contact saved:", updatedContact); // Ajoutez cette ligne
+
+    console.log("Contact saved:", updatedContact);
     navigation.navigate("LISTS");
   };
 
@@ -241,6 +252,10 @@ const styles = StyleSheet.create({
     flexDirection: "column"
     // alignItems: "center"
     // marginVertical: 10
+  },
+  statusColor: {
+    color: "white",
+    fontWeight: "bold"
   },
   image: {
     height: "100%",
