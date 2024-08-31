@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,9 +11,10 @@ import {
   Alert,
   Modal,
   Animated,
-  TouchableOpacity
+  TouchableOpacity,
+  ToastAndroid
 } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import * as Notifications from "expo-notifications";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
@@ -21,12 +23,17 @@ import LoadingScreen from "./LoadingScreen";
 import * as Linking from "expo-linking";
 import * as Contacts from "expo-contacts";
 import { Ionicons } from "@expo/vector-icons";
-// import Clipboard from "@react-native-clipboard/clipboard";
 import * as Clipboard from "expo-clipboard";
 
-import axios from "axios";
-
 const image = require("../assets/images/picture10.jpg");
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false
+  })
+});
 
 export default function CelebrationsScreen() {
   const navigation = useNavigation();
@@ -35,9 +42,82 @@ export default function CelebrationsScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [generatedMessage, setGeneratedMessage] = useState("");
-  const [animation] = useState(new Animated.Value(0));
   const [modalVisible, setModalVisible] = useState(false);
 
+  const openContacts = (phoneNumber) => {
+    const url = `tel:${phoneNumber}`;
+    Linking.openURL(url).catch((err) =>
+      console.error("Error opening dialer:", err)
+    );
+  };
+
+  // Fonction pour planifier une notification locale
+  const scheduleNotification = async (contactName, daysRemaining) => {
+    const message = `${contactName}'s birthday is in ${daysRemaining} days!`;
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Upcoming Birthday Reminder 🎉",
+        body: message
+      },
+      trigger: {
+        hour: 9, // Notification à 9h
+        minute: 0,
+        repeats: true
+      }
+    });
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Upcoming Birthday Reminder 🎉",
+        body: message
+      },
+      trigger: {
+        hour: 18, // Notification à 18h
+        minute: 0,
+        repeats: true
+      }
+    });
+
+    console.log(`Notification scheduled for ${contactName}: ${message}`);
+  };
+
+  // Fonction pour afficher un ToastAndroid
+  const showToast = (contactName, daysRemaining) => {
+    const message = `${contactName}'s birthday is in ${daysRemaining} days!`;
+    ToastAndroid.show(message, ToastAndroid.LONG);
+    console.log(`Toast shown: ${message}`);
+  };
+
+  // Fonction pour filtrer les contacts dans les 5 jours et programmer les notifications
+  const filterAndNotifyContacts = async (allContacts) => {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(today.getDate() + 5);
+
+    const filtered = allContacts.filter((contact) => {
+      const [month, day, year] = contact.date.split("/").map(Number);
+      const contactDate = new Date(year, month - 1, day);
+      const daysRemaining = Math.ceil(
+        (contactDate - today) / (1000 * 60 * 60 * 24)
+      );
+      if (contactDate >= today && contactDate <= endDate) {
+        if (daysRemaining > 0) {
+          scheduleNotification(contact.username, daysRemaining);
+          if (Platform.OS === "android") {
+            showToast(contact.username, daysRemaining);
+          }
+        }
+        return true;
+      }
+      return false;
+    });
+
+    setFilteredContacts(filtered);
+    console.log("Filtered contacts for notification:", filtered);
+  };
+
+  // Fonction pour récupérer les contacts et filtrer ceux qui ont un anniversaire proche
   const fetchContacts = useCallback(async () => {
     setLoading(true);
     setRefreshing(true);
@@ -47,20 +127,8 @@ export default function CelebrationsScreen() {
       if (storedContacts) {
         const allContacts = JSON.parse(storedContacts);
         console.log("Stored contacts:", allContacts);
-
-        const today = new Date();
-        const endDate = new Date();
-        endDate.setDate(today.getDate() + 5);
-
-        const filtered = allContacts.filter((contact) => {
-          const [month, day, year] = contact.date.split("/").map(Number);
-          const contactDate = new Date(year, month - 1, day);
-          return contactDate >= today && contactDate <= endDate;
-        });
-
         setContacts(allContacts);
-        setFilteredContacts(filtered);
-        console.log("Contacts fetched:", filtered);
+        filterAndNotifyContacts(allContacts);
       } else {
         console.log("No contacts found in storage.");
       }
@@ -79,25 +147,6 @@ export default function CelebrationsScreen() {
     console.log("Refreshing contacts...");
     fetchContacts();
   }, [fetchContacts]);
-
-  const openContacts = async () => {
-    if (Platform.OS === "android" || Platform.OS === "ios") {
-      const { status } = await Contacts.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission denied",
-          "We need permission to access your contacts."
-        );
-        return;
-      }
-
-      if (Platform.OS === "android") {
-        Linking.openURL("content://contacts/people/");
-      } else if (Platform.OS === "ios") {
-        Linking.openURL("contacts://");
-      }
-    }
-  };
 
   const generateMessage = async (relationship) => {
     console.log(`Generating message for relationship: ${relationship}`);
@@ -228,6 +277,7 @@ export default function CelebrationsScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
