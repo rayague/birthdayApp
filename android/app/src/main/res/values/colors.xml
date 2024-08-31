@@ -1,0 +1,6 @@
+<resources>
+  <color name="splashscreen_background">dodgerblue</color>
+  <color name="iconBackground">dodgerblue</color>
+  <color name="colorPrimary">#023c69</color>
+  <color name="colorPrimaryDark">dodgerblue</color>
+</resources>
